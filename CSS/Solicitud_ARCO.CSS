@@ -1,0 +1,467 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Estilos para la barra de navegación */
+.navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.navbar-brand img {
+    max-height: 70px;
+    margin-right: 10px; /* Espacio entre el logo y el texto */
+}
+
+.navbar-brand h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4B0082;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Reducido el espacio entre elementos */
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #4B0082;
+}
+
+.cta-button.accent {
+    background-color: #8b00ff;
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px; /* Reducido el tamaño del botón */
+    font-size: 0.9rem; /* Texto más pequeño */
+    font-weight: bold;
+    border-radius: 0;
+    transition: background-color 0.3s;
+}
+
+.cta-button.accent:hover {
+    background-color: #7000cc;
+}
+
+/* Estilos para el formulario */
+.formulario {
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: #f5f5f7;
+    padding: 30px;
+    border-radius: 0;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.formulario h2 {
+    color: #4B0082;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+}
+
+.form-description {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+/* Grid para los campos del formulario */
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Campos que ocupan todo el ancho */
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    background-color: #e0e0e0;
+    padding: 10px;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Azul al pasar el cursor o seleccionar */
+.form-group input:hover, 
+.form-group select:hover, 
+.form-group textarea:hover,
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 8px rgba(0, 102, 204, 0.5);
+    outline: none;
+}
+
+/* Verde cuando están llenos y válidos */
+.form-group input:valid:not(:placeholder-shown), 
+.form-group select:valid:not([value=""]), 
+.form-group textarea:valid:not(:placeholder-shown) {
+    border-color: #1a7535;
+    box-shadow: 0 0 8px rgba(26, 117, 53, 0.5);
+}
+
+/* Rojo cuando están vacíos o no pasan validación */
+.form-group input:invalid:not(:placeholder-shown), 
+.form-group select:invalid:not(:focus), 
+.form-group textarea:invalid:not(:placeholder-shown) {
+    border-color: #a52834;
+    box-shadow: 0 0 8px rgba(165, 40, 52, 0.5);
+}
+
+/* Checkbox de política de privacidad - ocupa todo el ancho */
+.privacy-checkbox-container {
+    grid-column: span 2;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    background-color: #e0e0e0;
+    padding: 15px;
+    border-radius: 4px;
+    text-align: center;
+    justify-content: center;
+}
+
+.privacy-checkbox-container input {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    appearance: checkbox;
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    opacity: 1;
+}
+
+/* Estilo para el texto de política, rojo por defecto */
+.privacy-text {
+    color: #a52834;
+    transition: color 0.3s ease;
+    font-weight: bold;
+}
+
+/* Todo el texto se vuelve verde cuando se acepta */
+.privacy-accepted .privacy-text {
+    color: #1a7535 !important;
+}
+
+.privacy-link {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.privacy-link:hover {
+    opacity: 0.8;
+}
+
+/* Botón de envío - ocupa todo el ancho */
+.cta-button {
+    grid-column: span 2;
+    background-color: #4B0082;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.cta-button:hover {
+    background-color: #3a0066;
+}
+
+/* Nota de emergencia - ocupa todo el ancho */
+.emergency-note {
+    grid-column: span 2;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.emergency-phone {
+    color: #a52834;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Estilos para los modales */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border: 3px solid #4B0082;
+    border-radius: 0;
+    position: relative;
+}
+
+.small-modal-container {
+    width: 90%;
+    max-width: 400px;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border: 3px solid #a52834;
+    border-radius: 0;
+    text-align: center;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #4B0082;
+    background: none;
+    border: none;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 0;
+}
+
+.close-modal:hover {
+    background-color: #f0f0f0;
+}
+
+.header-decoration {
+    border-bottom: 3px solid #4B0082;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.footer-decoration {
+    border-top: 2px solid #4B0082;
+    margin-top: 25px;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 25px;
+    margin-top: 15px;
+    background-color: #1a7535;
+    color: white;
+    text-decoration: none;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: none;
+    margin-right: 10px;
+    text-align: center;
+}
+
+.button:hover {
+    background-color: #145c2a;
+}
+
+.button-reject {
+    background-color: #a52834;
+}
+
+.button-reject:hover {
+    background-color: #7e1f28;
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.notification-button {
+    background-color: #4B0082;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.notification-button:hover {
+    background-color: #3a0066;
+}
+
+/* Modal de éxito */
+.success-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.success-modal-container {
+    width: 90%;
+    max-width: 400px;
+    background: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border: 3px solid #380055;
+    border-radius: 0;
+    text-align: center;
+}
+
+.success-button {
+    background-color: #380055;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.success-button:hover {
+    background-color: #2a0040;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    form {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-group,
+    .privacy-checkbox-container,
+    .cta-button,
+    .emergency-note {
+        grid-column: span 1;
+    }
+    
+    .formulario {
+        padding: 20px;
+        margin: 20px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+    }
+    
+    .navbar-brand h1 {
+        font-size: 1.3rem;
+    }
+    
+    .navbar-brand img {
+        max-height: 35px;
+    }
+    
+    .nav-links {
+        gap: 10px;
+    }
+    
+    .cta-button.accent {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
