@@ -22,7 +22,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 80px;
+            width: 60px;
             height: 100vh;
             background-color: #2c3e50;
             color: white;
@@ -37,15 +37,16 @@
 
         .sidebar_list {
             list-style: none;
-            padding: 20px 0;
+            padding: 15px 0;
         }
 
         .sidebar_element {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 15px;
             cursor: pointer;
             transition: background-color 0.3s;
+            white-space: nowrap;
         }
 
         .sidebar_element:hover {
@@ -53,36 +54,43 @@
         }
 
         .sidebar_icon {
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             margin-right: 15px;
             color: white;
+            flex-shrink: 0;
         }
 
         .sidebar_icon--logo {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
+            margin-left: 3px;
         }
 
         .sidebar_text {
-            white-space: nowrap;
-            font-size: 16px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar:hover .sidebar_text {
+            opacity: 1;
         }
 
         .sidebar_title {
-            font-size: 18px;
-            margin-bottom: 5px;
+            font-size: 16px;
+            margin-bottom: 3px;
         }
 
         .sidebar_info {
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.8;
         }
 
         /* Contenido principal */
         .main-content {
             flex: 1;
-            margin-left: 80px;
+            margin-left: 60px;
             padding: 20px;
             transition: margin-left 0.3s ease;
         }
@@ -111,10 +119,16 @@
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                width: 60px;
+                width: 50px;
             }
             .main-content {
-                margin-left: 60px;
+                margin-left: 50px;
+            }
+            .sidebar:hover {
+                width: 200px;
+            }
+            .sidebar:hover ~ .main-content {
+                margin-left: 200px;
             }
         }
     </style>
@@ -126,44 +140,38 @@
         <ul class="sidebar_list">
             <li class="sidebar_element">
                 <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo">
-                <div class="sidebar_hide">
-                    <p class="sidebar_text">Grúas DBACK</p>
-                </div>
+                <span class="sidebar_text">Grúas DBACK</span>
             </li>
 
-            <li class="sidebar_element" onclick="showSection('dashboard')">
+            <li class="sidebar_element" onclick="confirmRedirect()">
                 <img src="Elementos/bxs-home.svg" class="sidebar_icon">
-                <div class="sidebar_hide">
-                    <p class="sidebar_text">Inicio</p>
-                </div>
+                <span class="sidebar_text">Inicio</span>
             </li>
             
-            <li class="sidebar_element" onclick="showSection('gruas')">
-                <img src="Elementos/bxs-car-mechanic.svg" class="sidebar_icon">
-                <div class="sidebar_hide">
-                    <p class="sidebar_text">Grúas</p>
-                </div>
+            <li class="sidebar_element">
+                <a href="Gruas.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                    <img src="Elementos/bxs-car-mechanic.svg" class="sidebar_icon">
+                    <span class="sidebar_text">Grúas</span>
+                </a>
             </li>
             
             <li class="sidebar_element" onclick="showSection('gastos')">
                 <img src="Elementos/bx-money-withdraw.svg" class="sidebar_icon">
-                <div class="sidebar_hide">
-                    <p class="sidebar_text">Gastos</p>
-                </div>
+                <span class="sidebar_text">Gastos</span>
             </li>
             
-            <li class="sidebar_element" onclick="showSection('empleados')">
-                <img src="Elementos/bx-male-female.svg" class="sidebar_icon">
-                <div class="sidebar_hide">
-                    <p class="sidebar_text">Empleados</p>
-                </div>
+            <li class="sidebar_element">
+                <a href="Empleados.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                    <img src="Elementos/bx-male-female.svg" class="sidebar_icon">
+                    <span class="sidebar_text">Empleados</span>
+                </a>
             </li>
             
-            <li class="sidebar_element sidebar_element--avatar">
+            <li class="sidebar_element">
                 <img src="Elementos/bx-male-female.svg" class="sidebar_icon">
-                <div class="sidebar_hide">
-                    <h3 class="sidebar_title">Ricardo Payán</h3>
-                    <p class="sidebar_info">Ingeniero de Software</p>
+                <div>
+                    <div class="sidebar_text sidebar_title">Ricardo Payán</div>
+                    <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
                 </div>
             </li>
         </ul>
@@ -190,13 +198,6 @@
             <p>Administra los gastos de la empresa.</p>
             <!-- Contenido de gastos -->
         </section>
-
-        <!-- Sección de Empleados -->
-        <section id="empleados" class="content-section">
-            <h1>Gestión de Empleados</h1>
-            <p>Administra la información del personal.</p>
-            <!-- Contenido de empleados -->
-        </section>
     </main>
 
     <script>
@@ -209,6 +210,13 @@
             
             // Muestra la sección seleccionada
             document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Función para confirmar redirección
+        function confirmRedirect() {
+            if(confirm('¿Desea regresar al inicio? Esto cerrará su sesión actual.')) {
+                window.location.href = 'index.html';
+            }
         }
 
         // Carga inicial
