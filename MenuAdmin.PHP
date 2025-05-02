@@ -156,6 +156,7 @@
             </li>
             
             <li class="sidebar_element" onclick="showSection('gastos')">
+            <a href="Gastos.php" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
                 <img src="Elementos/bx-money-withdraw.svg" class="sidebar_icon">
                 <span class="sidebar_text">Gastos</span>
             </li>
