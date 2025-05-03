@@ -409,14 +409,7 @@
         <section id="gastos" class="content-section">
             <div class="section-header">
                 <h1>Registro de Gastos</h1>
-                <div>
-                    <button class="btn btn-secondary" onclick="exportGastos()">
-                        <i class="fas fa-file-export"></i> Exportar
-                    </button>
-                    <button class="btn btn-primary" onclick="addGasto()">
-                        <i class="fas fa-plus"></i> Nuevo Gasto
-                    </button>
-                </div>
+              
             </div>
             <p>Administra los gastos operativos de la empresa.</p>
             <!-- Contenido de gastos mejorado iría aquí -->

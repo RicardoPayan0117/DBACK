@@ -53,49 +53,7 @@ try {
             <div class="tab" onclick="openTab('reportes')">Reportes</div>
         </div>
         
-        <!-- Sección Registrar Gasto -->
-        <div id="registrar" class="tab-content active section">
-            <h2>Registrar Nuevo Gasto</h2>
-            
-            <?php
-            // Procesar el formulario cuando se envía
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar_gasto'])) {
-                /*
-                // Validar y sanitizar los datos
-                $fecha = $_POST['fecha'];
-                $concepto = htmlspecialchars($_POST['concepto']);
-                $monto = floatval($_POST['monto']);
-                $categoria_id = intval($_POST['categoria_id']);
-                $vehiculo_id = !empty($_POST['vehiculo_id']) ? intval($_POST['vehiculo_id']) : null;
-                $descripcion = htmlspecialchars($_POST['descripcion']);
-                
-                // Procesar archivo adjunto
-                $nombre_archivo = null;
-                if (isset($_FILES['factura']) && $_FILES['factura']['error'] === UPLOAD_ERR_OK) {
-                    $directorio = 'uploads/facturas/';
-                    if (!file_exists($directorio)) {
-                        mkdir($directorio, 0777, true);
-                    }
-                    
-                    $extension = pathinfo($_FILES['factura']['name'], PATHINFO_EXTENSION);
-                    $nombre_archivo = uniqid() . '.' . $extension;
-                    move_uploaded_file($_FILES['factura']['tmp_name'], $directorio . $nombre_archivo);
-                }
-                
-                // Insertar en la base de datos
-                try {
-                    $stmt = $pdo->prepare("INSERT INTO gastos (fecha, concepto, monto, categoria_id, vehiculo_id, descripcion, factura_adjunta) 
-                                          VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$fecha, $concepto, $monto, $categoria_id, $vehiculo_id, $descripcion, $nombre_archivo]);
-                    
-                    echo '<p class="success">Gasto registrado exitosamente!</p>';
-                } catch (PDOException $e) {
-                    echo '<p class="error">Error al registrar el gasto: ' . $e->getMessage() . '</p>';
-                }
-                */
-                echo '<p class="success">(Simulación) Gasto registrado exitosamente!</p>';
-            }
-            ?>
+      
             
             <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
