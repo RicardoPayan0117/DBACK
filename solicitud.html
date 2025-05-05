@@ -24,6 +24,64 @@
             width: 24px;
             height: 24px;
         }
+
+        /* Estilos para PayPal */
+        .paypal-success {
+            border: 1px solid #28a745;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .paypal-error {
+            border: 1px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .payment-info-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .payment-info-display h4 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        #paypal-button-container {
+            margin-top: 20px;
+        }
+
+        #custom-paypal-button {
+            background: #FFC439;
+            color: #111;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        #custom-paypal-button:hover {
+            background: #F0B72B;
+        }
+
+        #custom-paypal-button img {
+            height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -198,7 +256,7 @@
                 
                 <!-- Contenedor del botón de PayPal -->
                 <div id="paypal-button-container">
-                    <button id="custom-paypal-button" class="paypal-button" onclick="initiatePayPalPayment()">
+                    <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
                         <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo">
                         Pagar con PayPal
                     </button>
@@ -219,7 +277,6 @@
          
             <!-- Botones de acción -->
             <div class="action-buttons">
-               
                 <button type="submit" class="cta-button" id="submit-button">Enviar Solicitud</button>
             </div>
         </form>
@@ -389,6 +446,139 @@
             }, 1000);
         }
 
+        // Función para cargar el SDK de PayPal
+        function loadPayPalScript() {
+            // Verificar si el script ya está cargado
+            if (document.querySelector('script[src*="www.paypal.com/sdk/js"]')) {
+                return;
+            }
+            
+            // Mostrar mensaje de carga
+            document.getElementById('paypal-button-container').innerHTML = '<p>Cargando opciones de pago...</p>';
+            
+            // Cargar el SDK de PayPal
+            const script = document.createElement('script');
+            // IMPORTANTE: Reemplaza con tu Client ID real de PayPal
+            script.src = 'https://www.paypal.com/sdk/js?client-id=AQtRyS9WsZAGYVSbDj_acQ426CavpCZTucraVmHBgae8R9nHwz6HGigDPOgPYRZNxSIJdJLCY0y9FtHT&currency=MXN';
+            script.async = true;
+            
+            script.onerror = function() {
+                document.getElementById('paypal-button-container').innerHTML = `
+                    <div class="paypal-error">
+                        <h4>Error al cargar PayPal</h4>
+                        <p>No se pudo cargar el sistema de pagos. Por favor, recargue la página.</p>
+                    </div>
+                `;
+            };
+            
+            script.onload = function() {
+                setupPayPalButtons();
+            };
+            
+            document.body.appendChild(script);
+        }
+        
+        // Configurar los botones de PayPal
+        function setupPayPalButtons() {
+            // Limpiar el contenedor
+            const buttonContainer = document.getElementById('paypal-button-container');
+            buttonContainer.innerHTML = '';
+            
+            // Calcular el depósito (20% del costo total)
+            const deposito = (costoTotalServicio * 0.2).toFixed(2);
+            
+            if (typeof paypal !== 'undefined') {
+                paypal.Buttons({
+                    style: {
+                        color: 'blue',
+                        shape: 'rect',
+                        label: 'pay',
+                        height: 40
+                    },
+                    
+                    // Crear la orden
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                description: 'Depósito para servicio de grúa',
+                                amount: {
+                                    value: deposito,
+                                    currency_code: 'MXN'
+                                }
+                            }],
+                            application_context: {
+                                shipping_preference: 'NO_SHIPPING'
+                            }
+                        });
+                    },
+                    
+                    // Finalizar la transacción
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(orderData) {
+                            // Procesar la transacción completada
+                            const transaction = orderData.purchase_units[0].payments.captures[0];
+                            
+                            // Actualizar campos ocultos del formulario
+                            document.getElementById('paypal_order_id').value = data.orderID;
+                            document.getElementById('paypal_status').value = transaction.status;
+                            document.getElementById('paypal_email').value = orderData.payer.email_address;
+                            document.getElementById('paypal_name').value = orderData.payer.name.given_name + ' ' + 
+                                                                         orderData.payer.name.surname;
+                            
+                            // Mostrar mensaje de éxito
+                            buttonContainer.innerHTML = `
+                                <div class="paypal-success">
+                                    <h4>¡Pago completado con éxito!</h4>
+                                    <p>ID de la orden: ${data.orderID}</p>
+                                    <p>Monto pagado: $${deposito} MXN</p>
+                                    <p>Estado: ${transaction.status}</p>
+                                </div>
+                            `;
+                            
+                            // Habilitar el botón de enviar formulario
+                            document.getElementById('submit-button').disabled = false;
+                        });
+                    },
+                    
+                    // Manejar errores
+                    onError: function(err) {
+                        console.error('Error en PayPal:', err);
+                        buttonContainer.innerHTML = `
+                            <div class="paypal-error">
+                                <h4>Error en el pago</h4>
+                                <p>Ocurrió un error al procesar su pago. Por favor, intente nuevamente.</p>
+                            </div>
+                        `;
+                    }
+                }).render('#paypal-button-container');
+            }
+        }
+        
+        // Función para iniciar el pago con PayPal
+        function initiatePayPalPayment() {
+            // Verificar que hay un costo calculado
+            if (costoTotalServicio <= 0) {
+                alert("Por favor complete la información del servicio para calcular el costo.");
+                return;
+            }
+            
+            // Cargar el SDK de PayPal
+            loadPayPalScript();
+            
+            // Mostrar información del pago
+            const deposito = (costoTotalServicio * 0.2).toFixed(2);
+            const paymentInfo = document.createElement('div');
+            paymentInfo.className = 'payment-info-display';
+            paymentInfo.innerHTML = `
+                <h4>Resumen del Pago</h4>
+                <p>Costo total del servicio: $${costoTotalServicio.toFixed(2)} MXN</p>
+                <p>Depósito a pagar ahora (20%): $${deposito} MXN</p>
+                <p>Resto a pagar al finalizar el servicio: $${(costoTotalServicio * 0.8).toFixed(2)} MXN</p>
+            `;
+            
+            document.getElementById('paypal-button-container').prepend(paymentInfo);
+        }
+
         // Script para controlar la apertura y cierre de los modales
         document.addEventListener('DOMContentLoaded', function() {
             const consentModal = document.getElementById('consentModal');
@@ -459,30 +649,6 @@
             calcularDistancia(""); // Cálculo inicial simulado
         });
         
-        // Función para manejar el pago con PayPal
-        function initiatePayPalPayment() {
-            // En una implementación real, se comunicaría con la API de PayPal
-            // Esta es una simulación para el ejemplo
-            if (costoTotalServicio <= 0) {
-                alert("Error: No se ha podido calcular el costo del servicio.");
-                return;
-            }
-            
-            const deposito = (costoTotalServicio * 0.2).toFixed(2);
-            
-            // Simulación de un ID de pedido de PayPal
-            const fakeOrderId = 'PAYPAL-' + Math.random().toString(36).substring(2, 15);
-            
-            // Actualizar campos ocultos
-            document.getElementById('paypal_order_id').value = fakeOrderId;
-            document.getElementById('paypal_status').value = 'COMPLETED';
-            
-            alert(`Simulación de pago con PayPal completada.\nMonto: $${deposito} MXN\nOrder ID: ${fakeOrderId}`);
-            
-            // En un escenario real, esto redirigiría al usuario a PayPal
-            // y luego volvería con un callback
-        }
-        
         // Función para validar y enviar el formulario
         function validarYEnviarFormulario(event) {
             event.preventDefault();
@@ -514,6 +680,13 @@
             
             if (!formValido) {
                 alert("Por favor, complete todos los campos requeridos.");
+                return false;
+            }
+            
+            // Verificar si se ha realizado el pago (si aplica)
+            const paypalStatus = document.getElementById('paypal_status').value;
+            if (costoTotalServicio > 0 && paypalStatus !== 'COMPLETED') {
+                alert("Por favor complete el proceso de pago antes de enviar el formulario.");
                 return false;
             }
             
