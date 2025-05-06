@@ -18,6 +18,8 @@
 --
 -- Table structure for table `datos_empresa`
 --
+CREATE DATABASE  IF NOT EXISTS `dback`;
+USE `dback`;
 
 DROP TABLE IF EXISTS `datos_empresa`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
