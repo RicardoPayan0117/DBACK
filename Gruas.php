@@ -307,7 +307,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="Gruas.js"></script>
     <script>
         // Hacer que el nuevo botón principal active el mismo comportamiento que el botón original
         document.addEventListener('DOMContentLoaded', function() {
