@@ -6,41 +6,120 @@
     <meta name="description" content="Solicita nuestro servicio de grúas 24/7. Asistencia rápida y profesional para todo tipo de vehículos.">
     <title>Solicitar Servicio de Grúa | Grúas DBACK</title>
     <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
+    <style>
+        .location-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .location-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 5px;
+        }
+
+        .location-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Estilos para PayPal */
+        .paypal-success {
+            border: 1px solid #28a745;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .paypal-error {
+            border: 1px solid #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .payment-info-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .payment-info-display h4 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        #paypal-button-container {
+            margin-top: 20px;
+        }
+
+        #custom-paypal-button {
+            background: #FFC439;
+            color: #111;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        #custom-paypal-button:hover {
+            background: #F0B72B;
+        }
+
+        #custom-paypal-button img {
+            height: 20px;
+        }
+    </style>
 </head>
 <body>
-<nav class="navbar">
-    <div class="nav-content">
-        <!-- Parte izquierda: Logo y nombre -->
-        <a href="index.html" class="navbar-brand">
-            <img src="Elementos\LogoDBACK.png" alt="Logo DBACK">
-            <h1>Grúas DBACK</h1>
-        </a>
-        
-        <!-- Parte derecha: Enlaces y botón de llamada -->
-        <div class="nav-links">
-            <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
+    <nav class="navbar">
+        <div class="nav-content">
+            <!-- Parte izquierda: Logo y nombre -->
+            <a href="index.html" class="navbar-brand">
+                <img src="Elementos\LogoDBACK.png" alt="Logo DBACK">
+                <h1>Grúas DBACK</h1>
+            </a>
+            
+            <!-- Parte derecha: Enlaces y botón de llamada -->
+            <div class="nav-links">
+                <a href="index.html" class="cta-button">inicio</a>
+                <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
+            </div>
         </div>
-    </div>
-</nav>   
+    </nav>   
 
     <section class="formulario">
         <h2>Solicitar Servicio de Grúa</h2>
         <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
         <form action="procesar_formulario.php" method="post" id="servicioForm" onsubmit="return validarYEnviarFormulario(event)">
+            <!-- Información de contacto -->
             <div class="form-group">
                 <label for="nombre">Nombre completo:</label>
                 <input type="text" id="nombre" name="nombre" required 
                        pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}"
-                       placeholder="Ej: Pito Pérez"
+                       placeholder="Ej: Juan Pérez"
                        title="Ingrese un nombre válido (solo letras y espacios, mínimo 3 caracteres)">
             </div>
 
             <div class="form-group">
                 <label for="telefono">Teléfono de contacto:</label>
                 <input type="tel" id="telefono" name="telefono" required 
-                       pattern="[0-9]{3}[-][0-9]{3}[-][0-9]{4}"
-                       placeholder="Ej: 123-456-7890"
-                       title="Formato requerido: XXX-XXX-XXXX">
+                       pattern="(\d{10}|\d{3}-\d{3}-\d{4})"
+                       placeholder="Ej: 6681234567 o 668-123-4567"
+                       title="Formato requerido: XXXXXXXXXX o XXX-XXX-XXXX">
             </div>
 
             <div class="form-group">
@@ -53,14 +132,20 @@
 
             <div class="form-group">
                 <label for="ubicacion">Ubicación actual:</label>
-                <input type="text" id="ubicacion" name="ubicacion" required 
-                       minlength="5"
-                       placeholder="Dirección o punto de referencia" 
-                       list="ubicaciones"
-                       title="Ingrese una ubicación válida (mínimo 5 caracteres)">
+                <div class="location-input-container">
+                    <input type="text" id="ubicacion" name="ubicacion" required 
+                           minlength="5"
+                           placeholder="Dirección o punto de referencia" 
+                           list="ubicaciones"
+                           title="Ingrese una ubicación válida (mínimo 5 caracteres)">
+                    <button type="button" id="obtenerUbicacion" class="location-button">
+                        <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Obtener ubicación" title="Obtener mi ubicación actual">
+                    </button>
+                </div>
                 <datalist id="ubicaciones"></datalist>
             </div>
 
+            <!-- Información del vehículo -->
             <div class="form-group">
                 <label for="vehiculo">Tipo de vehículo:</label>
                 <select id="vehiculo" name="vehiculo" required>
@@ -71,7 +156,28 @@
                     <option value="camion">Camión</option>
                 </select>
             </div>
+            
+            <div class="form-group">
+                <label for="marca">Marca del vehículo:</label>
+                <input type="text" id="marca" name="marca" required
+                       minlength="2"
+                       placeholder="Ej: Toyota, Ford, Nissan">
+            </div>
+            
+            <div class="form-group">
+                <label for="modelo">Modelo del vehículo:</label>
+                <input type="text" id="modelo" name="modelo" required
+                       minlength="2"
+                       placeholder="Ej: Corolla, F-150, Sentra">
+            </div>
 
+            <div class="form-group">
+                <label for="foto">Foto del vehículo (opcional):</label>
+                <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
+                <p><small>Formatos aceptados: JPG, PNG. Tamaño máximo: 5MB</small></p>
+            </div>
+
+            <!-- Información del servicio -->
             <div class="form-group">
                 <label for="tipo_servicio">Tipo de Servicio:</label>
                 <select id="tipo_servicio" name="tipo_servicio" required>
@@ -102,15 +208,80 @@
                 </select>
             </div>
             
+            <!-- Información de cálculo de distancia y costos -->
+            <div class="info-container">
+                <div class="form-group">
+                    <label for="distancia">Distancia estimada:</label>
+                    <input type="text" id="distancia" name="distancia" readonly 
+                           placeholder="Calculando..." value="">
+                </div>
+                
+                <div class="form-group">
+                    <label for="costo">Costo estimado:</label>
+                    <input type="text" id="costo" name="costo" readonly 
+                           placeholder="Calculando..." value="">
+                </div>
+            </div>
+            
+            <!-- Sección de resumen para pago -->
+            <div class="summary-section">
+                <h3>Resumen de Solicitud</h3>
+                <div class="summary-row">
+                    <span>Cliente:</span>
+                    <span id="display-nombre">(Por completar)</span>
+                </div>
+                <div class="summary-row">
+                    <span>Correo:</span>
+                    <span id="display-email">(Por completar)</span>
+                </div>
+                <div class="summary-row">
+                    <span>Costo total estimado:</span>
+                    <span id="display-costo">$0.00 MXN</span>
+                </div>
+                <div class="summary-row">
+                    <span>Depósito requerido (20%):</span>
+                    <span id="display-deposito">$0.00 MXN</span>
+                </div>
+                <div class="summary-row">
+                    <span>Pago restante:</span>
+                    <span id="display-restante">$0.00 MXN</span>
+                </div>
+                
+            </div>
+               <!-- Información de pago con PayPal -->
+               <div class="payment-info">
+                <h3>Opciones de Pago</h3>
+                <p>Para asegurar su servicio, puede realizar un depósito del 20% del costo total estimado.</p>
+                <p>El monto restante se pagará al finalizar el servicio.</p>
+                
+                <!-- Contenedor del botón de PayPal -->
+                <div id="paypal-button-container">
+                    <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
+                        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo">
+                        Pagar con PayPal
+                    </button>
+                </div>
+                
+                <input type="hidden" id="paypal_order_id" name="paypal_order_id">
+                <input type="hidden" id="paypal_status" name="paypal_status">
+                <input type="hidden" id="paypal_email" name="paypal_email">
+                <input type="hidden" id="paypal_name" name="paypal_name">
+            </div>
+
             <!-- Checkbox para confirmar consentimiento -->
             <div id="privacy-container" class="privacy-checkbox-container">
                 <input type="checkbox" id="consentimiento" name="consentimiento" required>
                 <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal">política de privacidad</span></span></label>
             </div>
-
-            <button type="submit" class="cta-button">Enviar Solicitud</button>
+            
+         
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <button type="submit" class="cta-button" id="submit-button">Enviar Solicitud</button>
+            </div>
         </form>
-        <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+1234567890" class="emergency-phone">123-456-7890</a></p>
+        
+        <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
     </section>
 
     <!-- Modal de política de privacidad -->
@@ -180,203 +351,383 @@
     </div>
 
     <script>
+        // Variables globales
+        let costoTotalServicio = 0;
+        const ubicacionEmpresa = "21.019418,-89.617202"; // Coordenadas de la empresa
+        
+        // Función para obtener la ubicación actual
+        function obtenerUbicacionActual() {
+            const ubicacionInput = document.getElementById('ubicacion');
+            
+            if (!navigator.geolocation) {
+                alert("La geolocalización no es soportada por tu navegador");
+                return;
+            }
+            
+            ubicacionInput.placeholder = "Obteniendo ubicación...";
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const coordenadas = `${lat},${lng}`;
+                    
+                    // Simulamos la obtención de dirección (en implementación real usarías Google Maps API)
+                    ubicacionInput.value = coordenadas;
+                    calcularDistancia(coordenadas);
+                },
+                function(error) {
+                    console.error("Error al obtener la ubicación:", error);
+                    ubicacionInput.placeholder = "Dirección o punto de referencia";
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            alert("Permiso denegado para acceder a la ubicación");
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            alert("La información de ubicación no está disponible");
+                            break;
+                        case error.TIMEOUT:
+                            alert("Tiempo de espera agotado al obtener la ubicación");
+                            break;
+                        default:
+                            alert("Error desconocido al obtener la ubicación");
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Función para actualizar la información del usuario
+        function actualizarInfoUsuario() {
+            const nombre = document.getElementById('nombre').value || '(Por completar)';
+            const email = document.getElementById('email').value || '(No especificado)';
+            
+            document.getElementById('display-nombre').textContent = nombre;
+            document.getElementById('display-email').textContent = email;
+            
+            // Actualizar campos ocultos para el backend
+            document.getElementById('paypal_name').value = nombre;
+            document.getElementById('paypal_email').value = email;
+        }
+
+        // Función para actualizar la información de pago
+        function actualizarInfoPago() {
+            const deposito = (costoTotalServicio * 0.2).toFixed(2);
+            const restante = (costoTotalServicio * 0.8).toFixed(2);
+            
+            document.getElementById('display-costo').textContent = `${costoTotalServicio.toFixed(2)} MXN`;
+            document.getElementById('display-deposito').textContent = `${deposito} MXN`;
+            document.getElementById('display-restante').textContent = `${restante} MXN`;
+        }
+
+        // Función para calcular la distancia (simulada)
+        function calcularDistancia(destino) {
+            // En una implementación real, usarías la API de Google Maps
+            // Esta es una simulación para el ejemplo
+            setTimeout(() => {
+                const distanciaKm = Math.random() * 50 + 5; // Entre 5 y 55 km
+                const costoPorKilometro = 80; // 80 pesos por kilómetro
+                costoTotalServicio = distanciaKm * costoPorKilometro;
+                
+                // Mostrar la distancia y el costo
+                document.getElementById('distancia').value = `${distanciaKm.toFixed(2)} km`;
+                document.getElementById('costo').value = `${costoTotalServicio.toFixed(2)} MXN`;
+                
+                // Actualizar la sección de pago
+                actualizarInfoPago();
+                
+                // También actualizamos la información del usuario
+                actualizarInfoUsuario();
+            }, 1000);
+        }
+
+        // Función para cargar el SDK de PayPal
+        function loadPayPalScript() {
+            // Verificar si el script ya está cargado
+            if (document.querySelector('script[src*="www.paypal.com/sdk/js"]')) {
+                return;
+            }
+            
+            // Mostrar mensaje de carga
+            document.getElementById('paypal-button-container').innerHTML = '<p>Cargando opciones de pago...</p>';
+            
+            // Cargar el SDK de PayPal
+            const script = document.createElement('script');
+            // IMPORTANTE: Reemplaza con tu Client ID real de PayPal
+            script.src = 'https://www.paypal.com/sdk/js?client-id=AQtRyS9WsZAGYVSbDj_acQ426CavpCZTucraVmHBgae8R9nHwz6HGigDPOgPYRZNxSIJdJLCY0y9FtHT&currency=MXN';
+            script.async = true;
+            
+            script.onerror = function() {
+                document.getElementById('paypal-button-container').innerHTML = `
+                    <div class="paypal-error">
+                        <h4>Error al cargar PayPal</h4>
+                        <p>No se pudo cargar el sistema de pagos. Por favor, recargue la página.</p>
+                    </div>
+                `;
+            };
+            
+            script.onload = function() {
+                setupPayPalButtons();
+            };
+            
+            document.body.appendChild(script);
+        }
+        
+        // Configurar los botones de PayPal
+        function setupPayPalButtons() {
+            // Limpiar el contenedor
+            const buttonContainer = document.getElementById('paypal-button-container');
+            buttonContainer.innerHTML = '';
+            
+            // Calcular el depósito (20% del costo total)
+            const deposito = (costoTotalServicio * 0.2).toFixed(2);
+            
+            if (typeof paypal !== 'undefined') {
+                paypal.Buttons({
+                    style: {
+                        color: 'blue',
+                        shape: 'rect',
+                        label: 'pay',
+                        height: 40
+                    },
+                    
+                    // Crear la orden
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                description: 'Depósito para servicio de grúa',
+                                amount: {
+                                    value: deposito,
+                                    currency_code: 'MXN'
+                                }
+                            }],
+                            application_context: {
+                                shipping_preference: 'NO_SHIPPING'
+                            }
+                        });
+                    },
+                    
+                    // Finalizar la transacción
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(orderData) {
+                            // Procesar la transacción completada
+                            const transaction = orderData.purchase_units[0].payments.captures[0];
+                            
+                            // Actualizar campos ocultos del formulario
+                            document.getElementById('paypal_order_id').value = data.orderID;
+                            document.getElementById('paypal_status').value = transaction.status;
+                            document.getElementById('paypal_email').value = orderData.payer.email_address;
+                            document.getElementById('paypal_name').value = orderData.payer.name.given_name + ' ' + 
+                                                                         orderData.payer.name.surname;
+                            
+                            // Mostrar mensaje de éxito
+                            buttonContainer.innerHTML = `
+                                <div class="paypal-success">
+                                    <h4>¡Pago completado con éxito!</h4>
+                                    <p>ID de la orden: ${data.orderID}</p>
+                                    <p>Monto pagado: $${deposito} MXN</p>
+                                    <p>Estado: ${transaction.status}</p>
+                                </div>
+                            `;
+                            
+                            // Habilitar el botón de enviar formulario
+                            document.getElementById('submit-button').disabled = false;
+                        });
+                    },
+                    
+                    // Manejar errores
+                    onError: function(err) {
+                        console.error('Error en PayPal:', err);
+                        buttonContainer.innerHTML = `
+                            <div class="paypal-error">
+                                <h4>Error en el pago</h4>
+                                <p>Ocurrió un error al procesar su pago. Por favor, intente nuevamente.</p>
+                            </div>
+                        `;
+                    }
+                }).render('#paypal-button-container');
+            }
+        }
+        
+        // Función para iniciar el pago con PayPal
+        function initiatePayPalPayment() {
+            // Verificar que hay un costo calculado
+            if (costoTotalServicio <= 0) {
+                alert("Por favor complete la información del servicio para calcular el costo.");
+                return;
+            }
+            
+            // Cargar el SDK de PayPal
+            loadPayPalScript();
+            
+            // Mostrar información del pago
+            const deposito = (costoTotalServicio * 0.2).toFixed(2);
+            const paymentInfo = document.createElement('div');
+            paymentInfo.className = 'payment-info-display';
+            paymentInfo.innerHTML = `
+                <h4>Resumen del Pago</h4>
+                <p>Costo total del servicio: $${costoTotalServicio.toFixed(2)} MXN</p>
+                <p>Depósito a pagar ahora (20%): $${deposito} MXN</p>
+                <p>Resto a pagar al finalizar el servicio: $${(costoTotalServicio * 0.8).toFixed(2)} MXN</p>
+            `;
+            
+            document.getElementById('paypal-button-container').prepend(paymentInfo);
+        }
+
         // Script para controlar la apertura y cierre de los modales
         document.addEventListener('DOMContentLoaded', function() {
             const consentModal = document.getElementById('consentModal');
             const rejectModal = document.getElementById('rejectModal');
             const successModal = document.getElementById('successModal');
-            const openLink = document.getElementById('openConsentModal');
-            const closeButton = document.getElementById('closeModal');
-            const acceptButton = document.getElementById('acceptConsent');
-            const rejectButton = document.getElementById('rejectConsent');
-            const closeRejectButton = document.getElementById('closeRejectModal');
-            const closeSuccessButton = document.getElementById('closeSuccessModal');
+            const openConsentModal = document.getElementById('openConsentModal');
+            const closeModal = document.getElementById('closeModal');
+            const acceptConsent = document.getElementById('acceptConsent');
+            const rejectConsent = document.getElementById('rejectConsent');
+            const closeRejectModal = document.getElementById('closeRejectModal');
+            const closeSuccessModal = document.getElementById('closeSuccessModal');
             const consentCheckbox = document.getElementById('consentimiento');
-            const privacyContainer = document.getElementById('privacy-container');
             
-            // Verificar si ya existe consentimiento previo
-            if (localStorage.getItem('dataConsent') === 'accepted') {
-                consentCheckbox.checked = true;
-                privacyContainer.classList.add('privacy-accepted');
-            }
-            
-            // Abrir el modal al hacer clic en el enlace
-            openLink.addEventListener('click', function() {
+            // Evento para abrir modal de consentimiento
+            openConsentModal.addEventListener('click', function(e) {
+                e.preventDefault();
                 consentModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Evitar scroll en el fondo
             });
             
-            // También abrir el modal al hacer clic en el checkbox
-            consentCheckbox.addEventListener('click', function(event) {
-                // Si no está marcado, no hacemos nada
-                if (!this.checked) {
-                    privacyContainer.classList.remove('privacy-accepted');
-                    return;
-                }
-                
-                // Si no ha aceptado previamente, abrimos el modal
-                if (localStorage.getItem('dataConsent') !== 'accepted') {
-                    event.preventDefault(); // Evitamos que se marque el checkbox
-                    consentModal.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
-                }
-            });
-            
-            // Cerrar el modal con el botón X
-            closeButton.addEventListener('click', function() {
+            // Evento para cerrar el modal de consentimiento
+            closeModal.addEventListener('click', function() {
                 consentModal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Restaurar scroll
             });
             
-            // Cerrar el modal al hacer clic fuera del contenido
-            consentModal.addEventListener('click', function(event) {
-                if (event.target === consentModal) {
-                    consentModal.style.display = 'none';
-                    document.body.style.overflow = 'auto'; // Restaurar scroll
-                }
-            });
-            
-            // Cerrar el modal de rechazo
-            closeRejectButton.addEventListener('click', function() {
-                rejectModal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Restaurar scroll
-            });
-            
-            // Cerrar el modal de éxito
-            closeSuccessButton.addEventListener('click', function() {
-                successModal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Restaurar scroll
-                // Opcional: redirigir o resetear el formulario después de cerrar
-                document.getElementById('servicioForm').reset();
-            });
-            
-            // Manejar el botón Aceptar
-            acceptButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                localStorage.setItem('dataConsent', 'accepted');
+            // Evento para aceptar el consentimiento
+            acceptConsent.addEventListener('click', function(e) {
+                e.preventDefault();
                 consentCheckbox.checked = true;
                 consentModal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Restaurar scroll
-                // Cambiar el color del texto a verde
-                privacyContainer.classList.add('privacy-accepted');
             });
             
-            // Manejar el botón Rechazar
-            rejectButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                localStorage.setItem('dataConsent', 'rejected');
+            // Evento para rechazar el consentimiento
+            rejectConsent.addEventListener('click', function(e) {
+                e.preventDefault();
                 consentCheckbox.checked = false;
                 consentModal.style.display = 'none';
-                // Quitar la clase para que vuelva a rojo
-                privacyContainer.classList.remove('privacy-accepted');
-                // Mostrar el modal de notificación de rechazo
                 rejectModal.style.display = 'flex';
             });
-        });
-        
-        // Script para la función de autocompletado de ubicación
-        const ubicacionInput = document.getElementById('ubicacion');
-        const ubicacionesList = document.getElementById('ubicaciones');
-        
-        ubicacionInput.addEventListener('input', async () => {
-            const query = ubicacionInput.value;
-            if (query.length > 2) {
-                try {
-                    const response = await fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${query}&types=address&location=21.019418,-89.617202&radius=50000&key=TU_API_KEY`);
-                    const data = await response.json();
+            
+            // Evento para cerrar el modal de rechazo
+            closeRejectModal.addEventListener('click', function() {
+                rejectModal.style.display = 'none';
+            });
+            
+            // Evento para cerrar el modal de éxito
+            closeSuccessModal.addEventListener('click', function() {
+                successModal.style.display = 'none';
+                window.location.href = 'index.html'; // Redirigir a la página principal
+            });
+            
+            // Eventos para actualizar la información del usuario
+            const formInputs = document.querySelectorAll('#nombre, #email, #ubicacion');
+            formInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    actualizarInfoUsuario();
                     
-                    ubicacionesList.innerHTML = '';
-                    data.predictions.forEach(prediction => {
-                        const option = document.createElement('option');
-                        option.value = prediction.description;
-                        ubicacionesList.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('Error al obtener sugerencias:', error);
-                }
-            }
+                    // Si es el campo de ubicación, calcular distancia
+                    if (this.id === 'ubicacion' && this.value.length > 5) {
+                        calcularDistancia(this.value);
+                    }
+                });
+            });
+            
+            // Añadir evento al botón de obtener ubicación
+            document.getElementById('obtenerUbicacion').addEventListener('click', obtenerUbicacionActual);
+            
+            // Inicializar cálculos
+            calcularDistancia(""); // Cálculo inicial simulado
         });
         
-        // Función para validar y mostrar modal de éxito al enviar
+        // Función para validar y enviar el formulario
         function validarYEnviarFormulario(event) {
-            event.preventDefault(); // Detener el envío normal del formulario
+            event.preventDefault();
             
-            // Primero validamos como antes
-            if (validarFormulario()) {
-                // Si la validación es exitosa, mostramos el modal de éxito
-                document.getElementById('successModal').style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                
-                // También se podría enviar el formulario por AJAX aquí si se desea
-                // const formData = new FormData(document.getElementById('servicioForm'));
-                // fetch('procesar_formulario.php', {
-                //     method: 'POST',
-                //     body: formData
-                // })
-                
-                return false; // No enviar el formulario de manera tradicional
+            // Obtener elementos del formulario
+            const form = document.getElementById('servicioForm');
+            const consentCheckbox = document.getElementById('consentimiento');
+            const successModal = document.getElementById('successModal');
+            
+            // Verificar si el checkbox de consentimiento está marcado
+            if (!consentCheckbox.checked) {
+                const rejectModal = document.getElementById('rejectModal');
+                rejectModal.style.display = 'flex';
+                return false;
             }
             
-            return false; // No enviar el formulario si la validación falla
+            // Validar campos requeridos
+            let formValido = true;
+            const camposRequeridos = form.querySelectorAll('[required]');
+            
+            camposRequeridos.forEach(campo => {
+                if (!campo.value.trim()) {
+                    campo.classList.add('invalid');
+                    formValido = false;
+                } else {
+                    campo.classList.remove('invalid');
+                }
+            });
+            
+            if (!formValido) {
+                alert("Por favor, complete todos los campos requeridos.");
+                return false;
+            }
+            
+            // Verificar si se ha realizado el pago (si aplica)
+            const paypalStatus = document.getElementById('paypal_status').value;
+            if (costoTotalServicio > 0 && paypalStatus !== 'COMPLETED') {
+                alert("Por favor complete el proceso de pago antes de enviar el formulario.");
+                return false;
+            }
+            
+            // En una implementación real, aquí se enviarían los datos al servidor
+            // mediante una petición AJAX o Fetch
+            
+            // Simulamos una respuesta exitosa
+            setTimeout(() => {
+                successModal.style.display = 'flex';
+                
+                // Limpiar formulario
+                form.reset();
+                costoTotalServicio = 0;
+                actualizarInfoPago();
+                actualizarInfoUsuario();
+            }, 1000);
+            
+            return false; // Prevenir envío del formulario
         }
         
-        function validarFormulario() {
-            const nombre = document.getElementById('nombre');
-            const telefono = document.getElementById('telefono');
-            const email = document.getElementById('email');
-            const ubicacion = document.getElementById('ubicacion');
-            const descripcion = document.getElementById('descripcion');
-            const consentimiento = document.getElementById('consentimiento');
-
-            // Validación de consentimiento
-            if (!consentimiento.checked) {
-                alert('Debe aceptar la política de privacidad para continuar');
-                return false;
+        // Añadir funcionalidad para la carga de fotos
+        document.getElementById('foto').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Verificar tamaño del archivo (máximo 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+            if (file.size > maxSize) {
+                alert('El archivo es demasiado grande. El tamaño máximo permitido es 5MB.');
+                this.value = ''; // Limpiar el input
+                return;
             }
-
-            // Verificar que hayamos aceptado la política de privacidad
-            if (localStorage.getItem('dataConsent') !== 'accepted') {
-                alert('Debe abrir y aceptar la política de privacidad para continuar');
-                return false;
+            
+            // Verificar formato del archivo
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert('Formato de archivo no válido. Solo se permiten imágenes JPG y PNG.');
+                this.value = ''; // Limpiar el input
+                return;
             }
-
-            // Validación personalizada de nombre
-            if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}$/.test(nombre.value)) {
-                alert('Por favor ingrese un nombre válido');
-                nombre.focus();
-                return false;
-            }
-
-            // Validación personalizada de teléfono
-            if (!/^[0-9]{3}[0-9]{3}[0-9]{4}$/.test(telefono.value)) {
-                alert('Por favor ingrese un número de teléfono válido (Formato: 0123456789)');
-                telefono.focus();
-                return false;
-            }
-
-            // Validación de email si se proporciona
-            if (email.value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value)) {
-                alert('Por favor ingrese un correo electrónico válido');
-                email.focus();
-                return false;
-            }
-
-            // Validación de ubicación
-            if (ubicacion.value.length < 5) {
-                alert('Por favor ingrese una ubicación válida (mínimo 5 caracteres)');
-                ubicacion.focus();
-                return false;
-            }
-
-            // Validación de descripción
-            if (descripcion.value.length < 10 || descripcion.value.length > 500) {
-                alert('La descripción debe tener entre 10 y 500 caracteres');
-                descripcion.focus();
-                return false;
-            }
-
-            return true;
-        }
+        });
     </script>
 </body>
 </html>
