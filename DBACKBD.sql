@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `dback` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `dback`;
 -- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: dback
@@ -60,14 +58,15 @@ CREATE TABLE `empleados` (
   `ID_Empleado` int NOT NULL AUTO_INCREMENT,
   `Apellido1` varchar(50) NOT NULL,
   `Apellido2` varchar(50) NOT NULL,
-  `Nombre(s)` varchar(100) NOT NULL,
+  `Nombres` varchar(100) NOT NULL,
   `RFC` varchar(13) NOT NULL,
   `Nomina` bigint NOT NULL,
   `Fecha_Ingreso` date NOT NULL,
   `Puesto` varchar(100) NOT NULL,
   `Sueldo` decimal(5,2) NOT NULL,
-  `Usuario` varchar(50) NOT NULL,
-  `Contraseña` varchar(20) NOT NULL,
+  `telefono` bigint NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `licencia` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`ID_Empleado`),
   UNIQUE KEY `RFC_UNIQUE` (`RFC`),
   UNIQUE KEY `Nomina_UNIQUE` (`Nomina`)
@@ -80,7 +79,7 @@ CREATE TABLE `empleados` (
 
 LOCK TABLES `empleados` WRITE;
 /*!40000 ALTER TABLE `empleados` DISABLE KEYS */;
-INSERT INTO `empleados` VALUES (1,'Lopez','Payan','Kevin Ricardo','e3d2f424e2r',1542144815151,'2025-02-24','Ing. en sistemas',550.00,'KRLP','2001'),(2,'Flores','Guevara','Angel Gabriel','qfeqwbgfqd',5772553554241,'2025-02-24','sistemas',500.00,'POU','1234');
+INSERT INTO `empleados` VALUES (1,'Lopez','Payan','Kevin Ricardo','e3d2f424e2r',1542144815151,'2025-02-24','Ing. en sistemas',550.00,6688253351,NULL,NULL),(2,'Flores','Guevara','Angel Gabriel','qfeqwbgfqd',5772553554241,'2025-02-24','sistemas',500.00,0,NULL,NULL);
 /*!40000 ALTER TABLE `empleados` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -147,6 +146,7 @@ CREATE TABLE `gruas` (
 
 LOCK TABLES `gruas` WRITE;
 /*!40000 ALTER TABLE `gruas` DISABLE KEYS */;
+INSERT INTO `gruas` VALUES (1,'aefgw','suru','tuneado','Arrastre','Activa');
 /*!40000 ALTER TABLE `gruas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -192,6 +192,36 @@ LOCK TABLES `historial_servicio` WRITE;
 /*!40000 ALTER TABLE `historial_servicio` DISABLE KEYS */;
 /*!40000 ALTER TABLE `historial_servicio` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `mantenimiento_gruas`
+--
+
+DROP TABLE IF EXISTS `mantenimiento_gruas`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mantenimiento_gruas` (
+  `ID_Mantenimiento` int NOT NULL AUTO_INCREMENT,
+  `ID_Grua` int NOT NULL,
+  `Descripcion` varchar(200) NOT NULL,
+  `Costo` bigint NOT NULL,
+  `Fecha_Hora` datetime DEFAULT NULL,
+  `Autorizo` varchar(200) NOT NULL,
+  PRIMARY KEY (`ID_Mantenimiento`),
+  KEY `ID_MG_idx` (`ID_Grua`),
+  CONSTRAINT `ID_MG` FOREIGN KEY (`ID_Grua`) REFERENCES `gruas` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mantenimiento_gruas`
+--
+
+LOCK TABLES `mantenimiento_gruas` WRITE;
+/*!40000 ALTER TABLE `mantenimiento_gruas` DISABLE KEYS */;
+INSERT INTO `mantenimiento_gruas` VALUES (1,1,'cambio aceite',2000,'2025-05-05 17:50:38','gerente');
+/*!40000 ALTER TABLE `mantenimiento_gruas` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -201,33 +231,75 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `ActualizarFechaHoraInicio` BEFORE INSERT ON `historial_servicio` FOR EACH ROW BEGIN
-  SET NEW.Fecha_Hora_Inicio = NOW();
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `guardar_fecha_hora_mantenimiento` BEFORE INSERT ON `mantenimiento_gruas` FOR EACH ROW BEGIN
+    SET NEW.Fecha_Hora = NOW();
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `ActualizarFechaHoraFin` BEFORE UPDATE ON `historial_servicio` FOR EACH ROW BEGIN
-  IF NEW.Estado = 'Completado' THEN
-    SET NEW.Fecha_Hora_Fin = NOW();
-  END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `pagos_paypal`
+--
+
+DROP TABLE IF EXISTS `pagos_paypal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pagos_paypal` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `solicitud_id` int NOT NULL,
+  `order_id` varchar(50) NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `email_paypal` varchar(100) NOT NULL,
+  `nombre_paypal` varchar(100) NOT NULL,
+  `monto` decimal(10,2) NOT NULL,
+  `currency_code` varchar(3) NOT NULL DEFAULT 'MXN',
+  `fecha_pago` datetime DEFAULT CURRENT_TIMESTAMP,
+  `detalles` text,
+  PRIMARY KEY (`id`),
+  KEY `solicitud_id` (`solicitud_id`),
+  CONSTRAINT `pagos_paypal_ibfk_1` FOREIGN KEY (`solicitud_id`) REFERENCES `solicitudes` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pagos_paypal`
+--
+
+LOCK TABLES `pagos_paypal` WRITE;
+/*!40000 ALTER TABLE `pagos_paypal` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pagos_paypal` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `registros_arco`
+--
+
+DROP TABLE IF EXISTS `registros_arco`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `registros_arco` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ID_Servicio` int DEFAULT NULL,
+  `estado` enum('recibida','en_proceso','completada','rechazada') DEFAULT 'recibida',
+  `comentarios` text,
+  `evidencia` text,
+  PRIMARY KEY (`id`),
+  KEY `ID_AS_idx` (`ID_Servicio`),
+  CONSTRAINT `ID_AS` FOREIGN KEY (`ID_Servicio`) REFERENCES `historial_servicio` (`ID_Servicio`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `registros_arco`
+--
+
+LOCK TABLES `registros_arco` WRITE;
+/*!40000 ALTER TABLE `registros_arco` DISABLE KEYS */;
+/*!40000 ALTER TABLE `registros_arco` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `reparacion-servicio`
@@ -239,7 +311,7 @@ DROP TABLE IF EXISTS `reparacion-servicio`;
 CREATE TABLE `reparacion-servicio` (
   `ID_Gasto` int NOT NULL AUTO_INCREMENT,
   `ID_Grua` int NOT NULL,
-  `Tipo` enum('Reparacion','Mantenimiento','Gasolina') NOT NULL,
+  `Tipo` enum('Reparacion','Gasto_Oficina','Gasolina') NOT NULL,
   `Descripcion` varchar(400) NOT NULL,
   `Fecha` date NOT NULL,
   `Hora` time NOT NULL,
@@ -260,6 +332,96 @@ LOCK TABLES `reparacion-servicio` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `solicitudes`
+--
+
+DROP TABLE IF EXISTS `solicitudes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `solicitudes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre_completo` varchar(100) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `ubicacion` text NOT NULL,
+  `coordenadas` varchar(50) DEFAULT NULL,
+  `tipo_vehiculo` enum('automovil','camioneta','motocicleta','camion') NOT NULL,
+  `marca_vehiculo` varchar(50) NOT NULL,
+  `modelo_vehiculo` varchar(50) NOT NULL,
+  `foto_vehiculo` varchar(255) DEFAULT NULL,
+  `tipo_servicio` enum('remolque','bateria','gasolina','llanta','arranque','otro') NOT NULL,
+  `descripcion_problema` text,
+  `urgencia` enum('normal','urgente','emergencia') NOT NULL DEFAULT 'normal',
+  `distancia_km` decimal(10,2) DEFAULT NULL,
+  `costo_estimado` decimal(10,2) DEFAULT NULL,
+  `fecha_solicitud` datetime DEFAULT CURRENT_TIMESTAMP,
+  `estado` enum('pendiente','asignada','en_camino','en_proceso','completada','cancelada') DEFAULT 'pendiente',
+  `consentimiento_datos` tinyint(1) DEFAULT '0',
+  `ip_cliente` varchar(45) DEFAULT NULL,
+  `user_agent` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `solicitudes`
+--
+
+LOCK TABLES `solicitudes` WRITE;
+/*!40000 ALTER TABLE `solicitudes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `solicitudes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuarios` (
+  `ID_Usuario` int NOT NULL,
+  `ID_Empleado` int NOT NULL,
+  `ROL` enum('Admin','Chofer','RH','Gerente','SysAdmin') NOT NULL,
+  `Usuario` varchar(50) NOT NULL,
+  `Contraseña` varchar(25) NOT NULL,
+  `Fecha_cambio_contraseña` datetime DEFAULT NULL,
+  PRIMARY KEY (`ID_Usuario`),
+  KEY `ID_Empleado_idx` (`ID_Empleado`),
+  CONSTRAINT `ID_EU` FOREIGN KEY (`ID_Empleado`) REFERENCES `empleados` (`ID_Empleado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuarios`
+--
+
+LOCK TABLES `usuarios` WRITE;
+/*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
+INSERT INTO `usuarios` VALUES (1,1,'SysAdmin','KRLP','2001','2025-05-05 17:40:53');
+/*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `actualizar_fecha_cambio_contraseña` BEFORE UPDATE ON `usuarios` FOR EACH ROW BEGIN
+    IF OLD.contraseña <> NEW.contraseña THEN
+        SET NEW.Fecha_cambio_contraseña = NOW();
+    END IF;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
 -- Dumping events for database 'dback'
 --
 
@@ -276,4 +438,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-26 19:41:38
+-- Dump completed on 2025-05-05 17:53:12
