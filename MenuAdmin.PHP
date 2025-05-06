@@ -397,9 +397,6 @@
         <section id="gruas" class="content-section">
             <div class="section-header">
                 <h1>Administración de Grúas</h1>
-             <button class="btn btn-primary" onclick="addGrua()">
-                    <i class="fas fa-plus"></i> Agregar Grúa
-                </button>
             </div>
             <p>Gestiona el inventario de grúas de la empresa.</p>
             <!-- Contenido de grúas mejorado iría aquí -->
