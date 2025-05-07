@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Grúas</title>
     <link rel="stylesheet" href=".\CSS\Gruas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .main-action-button {
             background-color: #4CAF50;
@@ -33,10 +34,158 @@
             justify-content: flex-end;
             margin-bottom: 15px;
         }
+        
+        /* Estilos para el efecto de texto emergente */
+        .sidebar {
+            width: 70px;
+            position: fixed;
+            height: 100vh;
+            transition: width 0.3s ease;
+            z-index: 1000;
+            overflow: hidden;
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        .sidebar:hover {
+            width: 250px;
+        }
+        
+        .sidebar_text {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            margin-left: 10px;
+            white-space: nowrap;
+            color: white;
+        }
+        
+        .sidebar:hover .sidebar_text {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+        
+        .sidebar_element {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+        }
+        
+        .sidebar_link {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .sidebar_user-info {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            margin-left: 10px;
+        }
+        
+        .sidebar:hover .sidebar_user-info {
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+        
+        .main-content {
+            margin-left: 70px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .sidebar:hover ~ .main-content {
+            margin-left: 250px;
+        }
+        
+        .sidebar_icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .sidebar_header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar_footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar_list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar_element:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Barra lateral con efecto de texto emergente -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar_header">
+            <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK">
+            <span class="sidebar_text">Grúas DBACK</span>
+        </div>
+
+        <ul class="sidebar_list">
+            <li class="sidebar_element">
+                <a href="#" class="sidebar_link">
+                    <i class="fas fa-home sidebar_icon"></i>
+                    <span class="sidebar_text">Inicio</span>
+                </a>
+            </li>
+            
+            <li class="sidebar_element">
+                <a href="Gruas.php" class="sidebar_link">
+                    <i class="fas fa-truck sidebar_icon"></i>
+                    <span class="sidebar_text">Grúas</span>
+                </a>
+            </li>
+            
+            <li class="sidebar_element">
+                <a href="Gastos.php" class="sidebar_link">
+                    <i class="fas fa-money-bill-wave sidebar_icon"></i>
+                    <span class="sidebar_text">Gastos</span>
+                </a>
+            </li>
+            
+            <li class="sidebar_element">
+                <a href="Empleados.html" class="sidebar_link">
+                    <i class="fas fa-users sidebar_icon"></i>
+                    <span class="sidebar_text">Empleados</span>
+                </a>
+            </li>
+
+            <li class="sidebar_element">
+                <a href="#" class="sidebar_link">
+                    <i class="fas fa-cog sidebar_icon"></i>
+                    <span class="sidebar_text">Configuración</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar_footer">
+            <div class="sidebar_element">
+                <i class="fas fa-user-circle sidebar_icon"></i>
+                <div class="sidebar_user-info">
+                    <div class="sidebar_text sidebar_title">Ricardo Payán</div>
+                    <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="container main-content">
         <header>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <a href="MenuAdmin.php" class="back-button">
@@ -319,6 +468,25 @@
                 mainAddCraneBtn.addEventListener('click', function() {
                     // Simular clic en el botón original para aprovechar la lógica existente
                     addCraneBtn.click();
+                });
+            }
+            
+            // Opcional: Mejorar la experiencia en móviles para la barra lateral
+            const sidebar = document.getElementById('sidebar');
+            
+            // Para dispositivos táctiles
+            if ('ontouchstart' in window) {
+                let isExpanded = false;
+                
+                sidebar.addEventListener('click', function(e) {
+                    if (e.target.closest('.sidebar_element') || e.target.closest('.sidebar_footer')) {
+                        return; // No hacer nada si se hace clic en un elemento interactivo
+                    }
+                    
+                    isExpanded = !isExpanded;
+                    this.style.width = isExpanded ? '250px' : '70px';
+                    document.querySelector('.main-content').style.marginLeft = 
+                        isExpanded ? '250px' : '70px';
                 });
             }
         });
