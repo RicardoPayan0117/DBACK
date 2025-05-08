@@ -47,12 +47,12 @@ if (isset($_POST['Login'])) {
         $lastUsername = $usuario;
 
         // Primero verificamos si el usuario existe
-        $checkUser = "SELECT * FROM empleados WHERE USUARIO = '$usuario'";
+        $checkUser = "SELECT * FROM usuarios WHERE USUARIO = '$usuario'";
         $userResult = $conn->query($checkUser);
 
         if ($userResult->num_rows > 0) {
             // El usuario existe, ahora verificamos la contraseña
-            $checkPassword = "SELECT * FROM empleados WHERE USUARIO = '$usuario' AND CONTRASEÑA = '$clave'";
+            $checkPassword = "SELECT * FROM usuarios WHERE USUARIO = '$usuario' AND CONTRASEÑA = '$clave'";
             $passwordResult = $conn->query($checkPassword);
             
             if ($passwordResult->num_rows > 0) {
