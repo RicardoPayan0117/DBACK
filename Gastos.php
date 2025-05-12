@@ -395,12 +395,14 @@ try {
             </a>
         </li>
 
-        <li class="sidebar_element">
-            <a href="#" class="sidebar_link">
-                <i class="fas fa-cog sidebar_icon"></i>
-                <span class="sidebar_text">Configuración</span>
-            </a>
-        </li>
+        
+             <li class="sidebar_element" onclick="showSection('panel-solicitud')">
+                <a href="panel-solicitud.html" class="sidebar_link">
+                    <i class="fas fa-users sidebar_icon"></i>
+                    <span class="sidebar_text">panel-solicitud</span>
+                </a>
+            </li>
+
     </ul>
 
     <div class="sidebar_footer">
