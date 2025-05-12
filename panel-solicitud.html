@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitudes de Grúa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .status-pendiente { background-color: #ffc10733; color: #856404; }
+    .status-confirmado { background-color: #d4edda; color: #155724; }
+    .status-cancelado { background-color: #f8d7da; color: #721c24; }
+    .card:hover { box-shadow: 0 0 12px rgba(0,0,0,0.2); }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4"><i class="bi bi-truck"></i> Solicitudes de Grúa</h2>
+
+  <!-- TARJETA 1 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h5 class="card-title">🚗 Juan Pérez <small class="text-muted">(668-123-4567)</small></h5>
+          <p class="mb-1"><i class="bi bi-calendar3"></i> Fecha: 2025-05-12 14:30</p>
+          <p class="mb-1"><i class="bi bi-pin-map"></i> Distancia: 31.91 km</p>
+          <p class="mb-1"><i class="bi bi-currency-dollar"></i> Costo: $2,552.94 MXN</p>
+          <p class="mb-1"><i class="bi bi-tools"></i> Tipo: Arrastre ligero - Urgencia: Normal</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <div class="badge status-pendiente px-3 py-2 rounded-pill mb-2">🟡 Pendiente</div><br>
+          <button class="btn btn-outline-primary btn-sm" onclick="verDetalles('Juan Pérez', '668-123-4567', 'juan@ejemplo.com', '31.91 km', '2552.94 MXN', '2025-05-12 14:30', 'Arrastre ligero', 'Normal')">
+            <i class="bi bi-eye"></i> Ver Detalles
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repite más tarjetas según necesites... -->
+
+</div>
+
+<!-- MODAL DE DETALLES -->
+<div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalDetallesLabel">Detalles de la Solicitud</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Nombre:</strong> <span id="detNombre"></span></p>
+        <p><strong>Teléfono:</strong> <span id="detTelefono"></span></p>
+        <p><strong>Correo:</strong> <span id="detCorreo"></span></p>
+        <p><strong>Fecha:</strong> <span id="detFecha"></span></p>
+        <p><strong>Tipo de servicio:</strong> <span id="detTipo"></span></p>
+        <p><strong>Urgencia:</strong> <span id="detUrgencia"></span></p>
+        <p><strong>Distancia:</strong> <span id="detDistancia"></span></p>
+        <p><strong>Costo:</strong> <span id="detCosto"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS Bootstrap y lógica -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function verDetalles(nombre, telefono, correo, distancia, costo, fecha, tipo, urgencia) {
+    document.getElementById("detNombre").textContent = nombre;
+    document.getElementById("detTelefono").textContent = telefono;
+    document.getElementById("detCorreo").textContent = correo;
+    document.getElementById("detFecha").textContent = fecha;
+    document.getElementById("detTipo").textContent = tipo;
+    document.getElementById("detUrgencia").textContent = urgencia;
+    document.getElementById("detDistancia").textContent = distancia;
+    document.getElementById("detCosto").textContent = costo;
+
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalles'));
+    modal.show();
+  }
+</script>
+
+</body>
+</html>
