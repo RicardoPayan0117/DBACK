@@ -1,6 +1,5 @@
 <?php
 session_save_path('C:\php\php_sessiones');
-session_start(); // Iniciar la sesión
 
 // Variable para el mensaje de conexión
 $connectionMessage = "";
@@ -9,7 +8,7 @@ $connectionStatus = false;
 // Conectar a la base de datos al cargar la página
 $servername = "localhost";
 $username = "root";
-$password = "KRLP2001";  
+$password = "5211";  
 $dbname = "DBACK";
 
 // Variable para manejar la conexión sin detener la ejecución

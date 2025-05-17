@@ -1,479 +1,363 @@
 <!DOCTYPE html>
 <html lang="es">
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Solicita nuestro servicio de grúas 24/7. Asistencia rápida y profesional para todo tipo de vehículos.">
     <title>Solicitar Servicio de Grúa | Grúas DBACK</title>
     <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
-    <style>
-        /* Estilos generales */
-        .location-section {
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
-            background-color: #f9f9f9;
-        }
-        
-        .location-section h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        .location-input-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .location-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px;
-            margin-left: 5px;
-        }
-
-        .location-button img {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Estilos para PayPal */
-        .paypal-success {
-            border: 1px solid #28a745;
-            background-color: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .paypal-error {
-            border: 1px solid #dc3545;
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .payment-info-display {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .payment-methods {
-            margin: 20px 0;
-        }
-
-        .payment-method {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-method:hover {
-            background-color: #f0f0f0;
-        }
-
-        .payment-method.selected {
-            border-color: #007bff;
-            background-color: #e6f2ff;
-        }
-
-        .payment-method input[type="radio"] {
-            margin-right: 10px;
-        }
-
-        .payment-method-icon {
-            width: 32px;
-            height: 32px;
-            margin-right: 10px;
-        }
-
-        .payment-method-details {
-            flex-grow: 1;
-        }
-
-        .payment-method-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin: 0 0 5px 0;
-        }
-
-        .payment-method-description {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
-        }
-
-        .payment-container {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .payment-container.active {
-            display: block;
-        }
-
-        #custom-paypal-button {
-            background: #FFC439;
-            color: #111;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        #custom-paypal-button:hover {
-            background: #F0B72B;
-        }
-
-        #custom-paypal-button img {
-            height: 20px;
-        }
-    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-content">
-            <a href="index.html" class="navbar-brand">
-                <img src="Elementos\LogoDBACK.png" alt="Logo DBACK">
-                <h1>Grúas DBACK</h1>
-            </a>
-            
-            <div class="nav-links">
-                <a href="index.html" class="cta-button">inicio</a>
-                <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
-            </div>
-        </div>
-    </nav>   
-
-    <section class="formulario">
-        <h2>Solicitar Servicio de Grúa</h2>
-        <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
-        <form action="procesar_servicio.php" method="post" id="servicioForm" onsubmit="return validarYEnviarFormulario(event)">
-            <!-- Información de contacto -->
-            <div class="form-group">
-                <label for="nombre">Nombre completo:</label>
-                <input type="text" id="nombre" name="nombre" required 
-                       pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}"
-                       placeholder="Ej: Juan Pérez"
-                       title="Ingrese un nombre válido (solo letras y espacios, mínimo 3 caracteres)">
-            </div>
-
-            <div class="form-group">
-                <label for="telefono">Teléfono de contacto:</label>
-                <input type="tel" id="telefono" name="telefono" required 
-                       pattern="(\d{10}|\d{3}-\d{3}-\d{4})"
-                       placeholder="Ej: 6681234567 o 668-123-4567"
-                       title="Formato requerido: XXXXXXXXXX o XXX-XXX-XXXX">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Correo electrónico:</label>
-                <input type="email" id="email" name="email" 
-                       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                       placeholder="Ej: juan@ejemplo.com"
-                       title="Ingrese un correo electrónico válido">
-            </div>
-
-            <!-- Sección de ubicaciones -->
-            <div class="location-section">
-                <h3>Ubicación de Recogida</h3>
-                <div class="form-group">
-                    <label for="ubicacion_origen">Ubicación actual del vehículo:</label>
-                    <div class="location-input-container">
-                        <input type="text" id="ubicacion_origen" name="ubicacion_origen" required 
-                               minlength="5"
-                               placeholder="Dirección o punto de referencia" 
-                               list="ubicaciones_origen"
-                               title="Ingrese una ubicación válida (mínimo 5 caracteres)">
-                        <button type="button" id="obtenerUbicacionOrigen" class="location-button">
-                            <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Obtener ubicación" title="Obtener mi ubicación actual">
-                        </button>
-                    </div>
-                    <datalist id="ubicaciones_origen"></datalist>
-                </div>
-            </div>
-            
-            <div class="location-section">
-                <h3>Ubicación de Entrega</h3>
-                <div class="form-group">
-                    <label for="ubicacion_destino">¿A dónde necesita llevar el vehículo?</label>
-                    <div class="location-input-container">
-                        <input type="text" id="ubicacion_destino" name="ubicacion_destino" required 
-                               minlength="5"
-                               placeholder="Dirección o punto de referencia" 
-                               list="ubicaciones_destino"
-                               title="Ingrese una ubicación válida (mínimo 5 caracteres)">
-                        <button type="button" id="obtenerUbicacionDestino" class="location-button">
-                            <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Obtener ubicación" title="Obtener mi ubicación actual">
-                        </button>
-                    </div>
-                    <datalist id="ubicaciones_destino"></datalist>
-                </div>
-            </div>
-
-            <!-- Información del vehículo -->
-            <div class="form-group">
-                <label for="vehiculo">Tipo de vehículo:</label>
-                <select id="vehiculo" name="vehiculo" required>
-                    <option value="">Seleccione una opción</option>
-                    <option value="automovil">Automóvil</option>
-                    <option value="camioneta">Camioneta</option>
-                    <option value="motocicleta">Motocicleta</option>
-                    <option value="camion">Camión</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="marca">Marca del vehículo:</label>
-                <input type="text" id="marca" name="marca" required
-                       minlength="2"
-                       placeholder="Ej: Toyota, Ford, Nissan">
-            </div>
-            
-            <div class="form-group">
-                <label for="modelo">Modelo del vehículo:</label>
-                <input type="text" id="modelo" name="modelo" required
-                       minlength="2"
-                       placeholder="Ej: Corolla, F-150, Sentra">
-            </div>
-
-            <div class="form-group">
-                <label for="foto">Foto del vehículo (opcional):</label>
-                <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
-                <p><small>Formatos aceptados: JPG, PNG. Tamaño máximo: 5MB</small></p>
-            </div>
-
-            <!-- Información del servicio -->
-            <div class="form-group">
-                <label for="tipo_servicio">Tipo de Servicio:</label>
-                <select id="tipo_servicio" name="tipo_servicio" required>
-                    <option value="">Seleccione una opción</option>
-                    <option value="remolque">Remolque</option>
-                    <option value="bateria">Cambio de batería</option>
-                    <option value="gasolina">Suministro de gasolina</option>
-                    <option value="llanta">Cambio de llanta</option>
-                    <option value="arranque">Servicio de arranque</option>
-                    <option value="otro">Otro servicio</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="descripcion">Descripción del problema:</label>
-                <textarea id="descripcion" name="descripcion" rows="4" 
-                          minlength="10" maxlength="500"
-                          placeholder="Describa brevemente la situación"
-                          title="La descripción debe tener entre 10 y 500 caracteres"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="urgencia">Nivel de urgencia:</label>
-                <select id="urgencia" name="urgencia" required>
-                    <option value="normal">Normal</option>
-                    <option value="urgente">Urgente</option>
-                    <option value="emergencia">Emergencia</option>
-                </select>
-            </div>
-            
-            <!-- Información de cálculo de distancia y costos -->
-            <div class="info-container">
-                <div class="form-group">
-                    <label for="distancia">Distancia estimada:</label>
-                    <input type="text" id="distancia" name="distancia" readonly 
-                           placeholder="Calculando..." value="">
-                </div>
+    <header>
+        <nav class="navbar" aria-label="Navegación principal">
+            <div class="nav-content">
+                <a href="index.html" class="navbar-brand">
+                    <img src="Elementos\LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
+                    <h1>Grúas DBACK</h1>
+                </a>
                 
-                <div class="form-group">
-                    <label for="costo">Costo estimado:</label>
-                    <input type="text" id="costo" name="costo" readonly 
-                           placeholder="Calculando..." value="">
+                <div class="nav-links">
+                    <a href="index.html" class="cta-button">Inicio</a>
+                    <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
                 </div>
             </div>
+        </nav>   
+    </header>
+
+    <main>
+        <section class="formulario" aria-labelledby="form-title">
+            <h2 id="form-title">Solicitar Servicio de Grúa</h2>
+            <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
             
-            <!-- Sección de resumen para pago -->
-            <div class="summary-section">
-                <h3>Resumen de Solicitud</h3>
-                <div class="summary-row">
-                    <span>Cliente:</span>
-                    <span id="display-nombre">(Por completar)</span>
-                </div>
-                <div class="summary-row">
-                    <span>Correo:</span>
-                    <span id="display-email">(Por completar)</span>
-                </div>
-                <div class="summary-row">
-                    <span>Distancia estimada:</span>
-                    <span id="display-distancia">0 km</span>
-                </div>
-                <div class="summary-row">
-                    <span>Costo total estimado:</span>
-                    <span id="display-costo">$0.00 MXN</span>
-                </div>
-                <div class="summary-row">
-                    <span>Depósito requerido (20%):</span>
-                    <span id="display-deposito">$0.00 MXN</span>
-                </div>
-                <div class="summary-row">
-                    <span>Pago restante:</span>
-                    <span id="display-restante">$0.00 MXN</span>
-                </div>
-            </div>
-            
-            <!-- Información de pago -->
-            <div class="payment-info">
-                <h3>Opciones de Pago</h3>
-                <p>Para asegurar su servicio, puede realizar un depósito del 20% del costo total estimado.</p>
-                <p>El monto restante se pagará al finalizar el servicio.</p>
-                
-                <!-- Selección de método de pago -->
-                <div class="payment-methods">
-                    <div class="payment-method" onclick="selectPaymentMethod('efectivo')">
-                        <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo">
-                        <img src="https://cdn-icons-png.flaticon.com/512/639/639365.png" alt="Efectivo" class="payment-method-icon">
-                        <div class="payment-method-details">
-                            <h4 class="payment-method-title">Efectivo</h4>
-                            <p class="payment-method-description">Pago en efectivo al momento de recibir el servicio</p>
+            <form action="procesar_servicio.php" method="post" id="servicioForm" novalidate>
+                <!-- Información de contacto -->
+                <fieldset>
+                    <legend>Información de contacto</legend>
+                    
+                    <div class="form-group">
+                        <label for="nombre">Nombre completo:</label>
+                        <input type="text" id="nombre" name="nombre" required 
+                               pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}"
+                               placeholder="Ej: Juan Pérez"
+                               title="Ingrese un nombre válido (solo letras y espacios, mínimo 3 caracteres)"
+                               aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono de contacto:</label>
+                        <input type="tel" id="telefono" name="telefono" required 
+                               pattern="(\d{10}|\d{3}-\d{3}-\d{4})"
+                               placeholder="Ej: 6681234567 o 668-123-4567"
+                               title="Formato requerido: XXXXXXXXXX o XXX-XXX-XXXX"
+                               aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" 
+                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                               placeholder="Ej: juan@ejemplo.com"
+                               title="Ingrese un correo electrónico válido">
+                    </div>
+                </fieldset>
+
+                <!-- Sección de ubicaciones -->
+                <fieldset>
+                    <legend>Ubicaciones</legend>
+                    
+                    <div class="location-section">
+                        <h3>Ubicación de Recogida</h3>
+                        <div class="form-group">
+                            <label for="ubicacion_origen">Ubicación actual del vehículo:</label>
+                            <div class="location-input-container">
+                                <input type="text" id="ubicacion_origen" name="ubicacion_origen" required 
+                                       minlength="5"
+                                       placeholder="Dirección o punto de referencia" 
+                                       list="ubicaciones_origen"
+                                       title="Ingrese una ubicación válida (mínimo 5 caracteres)"
+                                       aria-required="true">
+                                <button type="button" id="obtenerUbicacionOrigen" class="location-button" aria-label="Obtener mi ubicación actual">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="" width="20" height="20">
+                                </button>
+                            </div>
+                            <datalist id="ubicaciones_origen"></datalist>
                         </div>
                     </div>
                     
-                    <div class="payment-method" onclick="selectPaymentMethod('paypal')">
-                        <input type="radio" name="metodo_pago" id="metodo_paypal" value="paypal">
-                        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="payment-method-icon">
-                        <div class="payment-method-details">
-                            <h4 class="payment-method-title">PayPal</h4>
-                            <p class="payment-method-description">Pago seguro con tarjeta de crédito o cuenta PayPal</p>
+                    <div class="location-section">
+                        <h3>Ubicación de Entrega</h3>
+                        <div class="form-group">
+                            <label for="ubicacion_destino">¿A dónde necesita llevar el vehículo?</label>
+                            <div class="location-input-container">
+                                <input type="text" id="ubicacion_destino" name="ubicacion_destino" required 
+                                       minlength="5"
+                                       placeholder="Dirección o punto de referencia" 
+                                       list="ubicaciones_destino"
+                                       title="Ingrese una ubicación válida (mínimo 5 caracteres)"
+                                       aria-required="true">
+                                <button type="button" id="obtenerUbicacionDestino" class="location-button" aria-label="Obtener mi ubicación actual">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="" width="20" height="20">
+                                </button>
+                            </div>
+                            <datalist id="ubicaciones_destino"></datalist>
                         </div>
                     </div>
-                </div>
+                </fieldset>
+
+                <!-- Información del vehículo -->
+                <fieldset>
+                    <legend>Información del vehículo</legend>
+                    
+                    <div class="form-group">
+                        <label for="vehiculo">Tipo de vehículo:</label>
+                        <select id="vehiculo" name="vehiculo" required aria-required="true">
+                            <option value="">Seleccione una opción</option>
+                            <option value="automovil">Automóvil</option>
+                            <option value="camioneta">Camioneta</option>
+                            <option value="motocicleta">Motocicleta</option>
+                            <option value="camion">Camión</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marca">Marca del vehículo:</label>
+                        <input type="text" id="marca" name="marca" required
+                               minlength="2"
+                               placeholder="Ej: Toyota, Ford, Nissan"
+                               aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modelo">Modelo del vehículo:</label>
+                        <input type="text" id="modelo" name="modelo" required
+                               minlength="2"
+                               placeholder="Ej: Corolla, F-150, Sentra"
+                               aria-required="true">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto">Foto del vehículo (opcional):</label>
+                        <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
+                        <p><small>Formatos aceptados: JPG, PNG. Tamaño máximo: 5MB</small></p>
+                    </div>
+                </fieldset>
+
+                <!-- Información del servicio -->
+                <fieldset>
+                    <legend>Detalles del servicio</legend>
+                    
+                    <div class="form-group">
+                        <label for="tipo_servicio">Tipo de Servicio:</label>
+                        <select id="tipo_servicio" name="tipo_servicio" required aria-required="true">
+                            <option value="">Seleccione una opción</option>
+                            <option value="remolque">Remolque</option>
+                            <option value="bateria">Cambio de batería</option>
+                            <option value="gasolina">Suministro de gasolina</option>
+                            <option value="llanta">Cambio de llanta</option>
+                            <option value="arranque">Servicio de arranque</option>
+                            <option value="otro">Otro servicio</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción del problema:</label>
+                        <textarea id="descripcion" name="descripcion" rows="4" 
+                                  minlength="10" maxlength="500"
+                                  placeholder="Describa brevemente la situación"
+                                  title="La descripción debe tener entre 10 y 500 caracteres"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="urgencia">Nivel de urgencia:</label>
+                        <select id="urgencia" name="urgencia" required aria-required="true">
+                            <option value="normal">Normal</option>
+                            <option value="urgente">Urgente</option>
+                            <option value="emergencia">Emergencia</option>
+                        </select>
+                    </div>
+                </fieldset>
                 
-                <!-- Contenedor para efectivo -->
-                <div id="efectivo-container" class="payment-container">
-                    <p>Ha seleccionado pago en efectivo.</p>
-                    <p>El monto total de <strong id="efectivo-total">$0.00 MXN</strong> deberá ser pagado al finalizar el servicio.</p>
-                    <p><strong>Nota:</strong> Al elegir este método, un operador se pondrá en contacto con usted para confirmar los detalles.</p>
-                </div>
-                
-                <!-- Contenedor del botón de PayPal -->
-                <div id="paypal-container" class="payment-container">
-                    <div id="paypal-button-container">
-                        <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
-                            <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo">
-                            Pagar con PayPal
-                        </button>
+                <!-- Información de cálculo de distancia y costos -->
+                <div class="info-container" aria-live="polite">
+                    <div class="form-group">
+                        <label for="distancia">Distancia estimada:</label>
+                        <input type="text" id="distancia" name="distancia" readonly 
+                               placeholder="Calculando..." value="" aria-readonly="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="costo">Costo estimado:</label>
+                        <input type="text" id="costo" name="costo" readonly 
+                               placeholder="Calculando..." value="" aria-readonly="true">
                     </div>
                 </div>
                 
-                <input type="hidden" id="paypal_order_id" name="paypal_order_id">
-                <input type="hidden" id="paypal_status" name="paypal_status">
-                <input type="hidden" id="paypal_email" name="paypal_email">
-                <input type="hidden" id="paypal_name" name="paypal_name">
-                <input type="hidden" id="metodo_pago_seleccionado" name="metodo_pago_seleccionado" value="">
-            </div>
+                <!-- Sección de resumen para pago -->
+                <div class="summary-section" aria-live="polite">
+                    <h3>Resumen de Solicitud</h3>
+                    <div class="summary-row">
+                        <span>Cliente:</span>
+                        <span id="display-nombre">(Por completar)</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Correo:</span>
+                        <span id="display-email">(Por completar)</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Distancia estimada:</span>
+                        <span id="display-distancia">0 km</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Costo total estimado:</span>
+                        <span id="display-costo">$0.00 MXN</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Depósito requerido (20%):</span>
+                        <span id="display-deposito">$0.00 MXN</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Pago restante:</span>
+                        <span id="display-restante">$0.00 MXN</span>
+                    </div>
+                </div>
+                
+                <!-- Información de pago -->
+                <fieldset>
+                    <legend>Opciones de pago</legend>
+                    <p>Para asegurar su servicio, puede realizar un depósito del 20% del costo total estimado.</p>
+                    <p>El monto restante se pagará al finalizar el servicio.</p>
+                    
+                    <!-- Selección de método de pago -->
+                    <div class="payment-methods" role="radiogroup" aria-labelledby="payment-methods-label">
+                        <h4 id="payment-methods-label">Seleccione método de pago:</h4>
+                        
+                        <div class="payment-method" tabindex="0" role="radio" aria-checked="true" onclick="selectPaymentMethod('efectivo')" onkeydown="handlePaymentMethodKey(event, 'efectivo')">
+                            <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo" checked>
+                            <img src="https://cdn-icons-png.flaticon.com/512/639/639365.png" alt="Efectivo" class="payment-method-icon" width="40" height="40">
+                            <div class="payment-method-details">
+                                <h4 class="payment-method-title">Efectivo</h4>
+                                <p class="payment-method-description">Pago en efectivo al momento de recibir el servicio</p>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method" tabindex="0" role="radio" aria-checked="false" onclick="selectPaymentMethod('paypal')" onkeydown="handlePaymentMethodKey(event, 'paypal')">
+                            <input type="radio" name="metodo_pago" id="metodo_paypal" value="paypal">
+                            <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="payment-method-icon" width="40" height="40">
+                            <div class="payment-method-details">
+                                <h4 class="payment-method-title">PayPal</h4>
+                                <p class="payment-method-description">Pago seguro con tarjeta de crédito o cuenta PayPal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenedor para efectivo -->
+                    <div id="efectivo-container" class="payment-container">
+                        <p>Ha seleccionado pago en efectivo.</p>
+                        <p>El monto total de <strong id="efectivo-total">$0.00 MXN</strong> deberá ser pagado al finalizar el servicio.</p>
+                        <p><strong>Nota:</strong> Al elegir este método, un operador se pondrá en contacto con usted para confirmar los detalles.</p>
+                    </div>
+                    
+                    <!-- Contenedor del botón de PayPal -->
+                    <div id="paypal-container" class="payment-container" style="display:none;">
+                        <div id="paypal-button-container">
+                            <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
+                                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo" width="20" height="20">
+                                Pagar con PayPal
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="paypal_order_id" name="paypal_order_id">
+                    <input type="hidden" id="paypal_status" name="paypal_status">
+                    <input type="hidden" id="paypal_email" name="paypal_email">
+                    <input type="hidden" id="paypal_name" name="paypal_name">
+                    <input type="hidden" id="metodo_pago_seleccionado" name="metodo_pago_seleccionado" value="efectivo">
+                </fieldset>
 
-            <!-- Checkbox para confirmar consentimiento -->
-            <div id="privacy-container" class="privacy-checkbox-container">
-                <input type="checkbox" id="consentimiento" name="consentimiento" required>
-                <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal">política de privacidad</span></span></label>
-            </div>
+                <!-- Checkbox para confirmar consentimiento -->
+                <div id="privacy-container" class="privacy-checkbox-container">
+                    <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true">
+                    <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span></span></label>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="action-buttons">
+                    <button type="submit" class="cta-button" id="submit-button">Enviar Solicitud</button>
+                </div>
+            </form>
             
-            <!-- Botones de acción -->
-            <div class="action-buttons">
-                <button type="submit" class="cta-button" id="submit-button">Enviar Solicitud</button>
+            <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
+        </section>
+
+        <!-- Modal de política de privacidad -->
+        <div id="consentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="consentModalTitle" hidden>
+            <div class="modal-container">
+                <button class="close-modal" id="closeModal" aria-label="Cerrar modal">&times;</button>
+                
+                <div class="header-decoration">
+                    <h1 id="consentModalTitle">Consentimiento de Datos Personales</h1>
+                </div>
+                
+                <div class="modal-content">
+                    <p>Por este medio, expreso y otorgo mi consentimiento a Grúas DBACK en la recopilación, almacenamiento y uso de mis datos personales, con los fines relacionados con la prestación y uso de los servicios prestados por Grúas DBACK, tales como solicitudes de asistencia, el seguimiento de vehículos atendidos y la emisión de recibos o facturas de pago correspondiente.</p>
+                    
+                    <h2>Datos personales recopilados</h2>
+                    <ul>
+                        <li>Nombre completo</li>
+                        <li>Domicilio</li>
+                        <li>Número de teléfono</li>
+                        <li>Correo electrónico</li>
+                        <li>Datos del vehículo</li>
+                        <li>Información de la solicitud de servicio</li>
+                        <li>Ubicación del servicio</li>
+                        <li>Fecha y hora de la solicitud</li>
+                    </ul>
+                    
+                    <h2>Tratamiento de datos</h2>
+                    <p>La información recopilada será tratada en estricto apego a lo establecido por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y será utilizada exclusivamente para los fines mencionados.</p>
+                    
+                    <h2>Medios de contacto de Grúas DBACK para ejercer mis derechos ARCO</h2>
+                    <p>Para más información sobre los derechos ARCO, visita: <a href="https://www.gob.mx/cms/uploads/attachment/file/428335/DDP_Gu_a_derechos_ARCO_13Dic18.pdf" target="_blank">Guía Derechos ARCO</a></p>
+                    <p>Correo electrónico: <a href="mailto:protecciondedatos@gruasdback.com">protecciondedatos@gruasdback.com</a></p>
+                    <p>Teléfono: <a href="tel:6688132905">668 813 2905</a></p>
+                    <p>Dirección: Manuel Castro Elizalde 895 SUR, Luis Donaldo Colosio, Colón, 81233 Los Mochis, Sin.</p>
+                    
+                    <h2>Consentimiento</h2>
+                    <p>Al hacer clic en "Aceptar", confirmo que he leído y comprendido los términos de esta autorización y que otorgo mi consentimiento para el tratamiento de mis datos personales a Grúas DBACK.</p>
+                    
+                    <div class="button-container">
+                        <button class="button" id="acceptConsent">Aceptar</button>
+                        <button class="button button-reject" id="rejectConsent">Rechazar</button>
+                    </div>
+                </div>
+                
+                <div class="footer-decoration">
+                    <p>Grúas DBACK - Documento de Consentimiento de Datos Personales</p>
+                </div>
             </div>
-        </form>
+        </div>
         
-        <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
-    </section>
-
-    <!-- Modal de política de privacidad -->
-    <div id="consentModal" class="modal-overlay">
-        <div class="modal-container">
-            <button class="close-modal" id="closeModal">&times;</button>
-            
-            <div class="header-decoration">
-                <h1>Consentimiento de Datos Personales</h1>
-            </div>
-            
-            <p>Por este medio, expreso y otorgo mi consentimiento a Grúas DBACK en la recopilación, almacenamiento y uso de mis datos personales, con los fines relacionados con la prestación y uso de los servicios prestados por Grúas DBACK, tales como solicitudes de asistencia, el seguimiento de vehículos atendidos y la emisión de recibos o facturas de pago correspondiente.</p>
-            
-            <h2>Datos personales recopilados</h2>
-            <ul>
-                <li>Nombre completo</li>
-                <li>Domicilio</li>
-                <li>Número de teléfono</li>
-                <li>Correo electrónico</li>
-                <li>Datos del vehículo</li>
-                <li>Información de la solicitud de servicio</li>
-                <li>Ubicación del servicio</li>
-                <li>Fecha y hora de la solicitud</li>
-            </ul>
-            
-            <h2>Tratamiento de datos</h2>
-            <p>La información recopilada será tratada en estricto apego a lo establecido por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y será utilizada exclusivamente para los fines mencionados.</p>
-            
-            <h2>Medios de contacto de Grúas DBACK para ejercer mis derechos ARCO</h2>
-            <p>Para más información sobre los derechos ARCO, visita: <a href="https://www.gob.mx/cms/uploads/attachment/file/428335/DDP_Gu_a_derechos_ARCO_13Dic18.pdf" target="_blank">Guía Derechos ARCO</a></p>
-            <p>Correo electrónico: <a href="mailto:protecciondedatos@gruasdback.com">protecciondedatos@gruasdback.com</a></p>
-            <p>Teléfono: <a href="tel:6688132905">668 813 2905</a></p>
-            <p>Dirección: Manuel Castro Elizalde 895 SUR, Luis Donaldo Colosio, Colón, 81233 Los Mochis, Sin.</p>
-            
-            <h2>Consentimiento</h2>
-            <p>Al hacer clic en "Aceptar", confirmo que he leído y comprendido los términos de esta autorización y que otorgo mi consentimiento para el tratamiento de mis datos personales a Grúas DBACK.</p>
-            
-            <div class="button-container">
-                <a href="#" class="button" id="acceptConsent">Aceptar</a>
-                <a href="#" class="button button-reject" id="rejectConsent">Rechazar</a>
-            </div>
-            
-            <div class="footer-decoration">
-                <p>Grúas DBACK - Documento de Consentimiento de Datos Personales</p>
+        <!-- Modal de notificación de rechazo -->
+        <div id="rejectModal" class="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="rejectModalTitle" hidden>
+            <div class="small-modal-container">
+                <h2 id="rejectModalTitle">Consentimiento Requerido</h2>
+                <p>Debe aceptar la política de privacidad para utilizar nuestros servicios. 
+                    No podemos procesar su solicitud sin su consentimiento para el tratamiento de datos personales.</p>
+                <button class="notification-button" id="closeRejectModal">Entendido</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Modal de notificación de rechazo -->
-    <div id="rejectModal" class="modal-overlay">
-        <div class="small-modal-container">
-            <h2>Consentimiento Requerido</h2>
-            <p>Debe aceptar la política de privacidad para utilizar nuestros servicios. 
-                No podemos procesar su solicitud sin su consentimiento para el tratamiento de datos personales.</p>
-            <button class="notification-button" id="closeRejectModal">Entendido</button>
+        
+        <!-- Modal de éxito al enviar -->
+        <div id="successModal" class="success-modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="successModalTitle" hidden>
+            <div class="success-modal-container">
+                <h2 id="successModalTitle">¡Solicitud Enviada!</h2>
+                <p>Su solicitud se ha enviado con éxito.</p>
+                <p>Nos pondremos en contacto con usted a la brevedad posible.</p>
+                <button class="success-button" id="closeSuccessModal">Aceptar</button>
+            </div>
         </div>
-    </div>
-    
-    <!-- Modal de éxito al enviar -->
-    <div id="successModal" class="success-modal-overlay">
-        <div class="success-modal-container">
-            <h2>¡Solicitud Enviada!</h2>
-            <p>Su solicitud se ha enviado con éxito.</p>
-            <p>Nos pondremos en contacto con usted a la brevedad posible.</p>
-            <button class="success-button" id="closeSuccessModal">Aceptar</button>
-        </div>
-    </div>
+    </main>
 
     <script>
         // Variables globales
@@ -593,30 +477,33 @@
             }, 1000);
         }
 
+        // Función para manejar teclado en métodos de pago
+        function handlePaymentMethodKey(event, method) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectPaymentMethod(method);
+            }
+        }
+
         // Función para seleccionar método de pago
         function selectPaymentMethod(method) {
             // Actualizar radio buttons
             document.getElementById('metodo_efectivo').checked = (method === 'efectivo');
             document.getElementById('metodo_paypal').checked = (method === 'paypal');
             
-            // Actualizar clases CSS de los contenedores de métodos
-            document.querySelectorAll('.payment-method').forEach(el => {
-                el.classList.remove('selected');
+            // Actualizar atributos ARIA
+            document.querySelectorAll('[role="radio"]').forEach(el => {
+                el.setAttribute('aria-checked', 'false');
             });
             
-            // Seleccionar el método elegido
-            if (method === 'efectivo') {
-                document.querySelector('.payment-method:nth-child(1)').classList.add('selected');
-            } else if (method === 'paypal') {
-                document.querySelector('.payment-method:nth-child(2)').classList.add('selected');
+            const selectedMethod = document.querySelector(`.payment-method[onclick*="${method}"]`);
+            if (selectedMethod) {
+                selectedMethod.setAttribute('aria-checked', 'true');
             }
             
-            // Mostrar el contenedor correspondiente
-            document.querySelectorAll('.payment-container').forEach(el => {
-                el.classList.remove('active');
-            });
-            
-            document.getElementById(`${method}-container`).classList.add('active');
+            // Mostrar/ocultar contenedores
+            document.getElementById('efectivo-container').style.display = method === 'efectivo' ? 'block' : 'none';
+            document.getElementById('paypal-container').style.display = method === 'paypal' ? 'block' : 'none';
             
             // Guardar el método seleccionado en el campo oculto
             document.getElementById('metodo_pago_seleccionado').value = method;
@@ -755,7 +642,7 @@
             
             // Verificar consentimiento
             if (!document.getElementById('consentimiento').checked) {
-                document.getElementById('rejectModal').style.display = 'flex';
+                document.getElementById('rejectModal').hidden = false;
                 return false;
             }
             
@@ -773,7 +660,7 @@
             }
             
             // Mostrar modal de éxito
-            document.getElementById('successModal').style.display = 'flex';
+            document.getElementById('successModal').hidden = false;
             
             // Enviar el formulario después de 2 segundos (simulación)
             setTimeout(() => {
@@ -781,6 +668,21 @@
             }, 2000);
             
             return true;
+        }
+
+        // Función para manejar el modal de consentimiento
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            modal.hidden = !show;
+            
+            if (show) {
+                modal.setAttribute('aria-hidden', 'false');
+                // Enfocar el primer elemento interactivo del modal
+                const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable) focusable.focus();
+            } else {
+                modal.setAttribute('aria-hidden', 'true');
+            }
         }
 
         // Event Listeners
@@ -805,47 +707,61 @@
             // Modal de consentimiento
             document.getElementById('openConsentModal').addEventListener('click', function(e) {
                 e.preventDefault();
-                document.getElementById('consentModal').style.display = 'flex';
+                toggleModal('consentModal', true);
             });
             
             document.getElementById('closeModal').addEventListener('click', function() {
-                document.getElementById('consentModal').style.display = 'none';
+                toggleModal('consentModal', false);
             });
             
             document.getElementById('acceptConsent').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('consentimiento').checked = true;
-                document.getElementById('consentModal').style.display = 'none';
+                toggleModal('consentModal', false);
             });
             
             document.getElementById('rejectConsent').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('consentimiento').checked = false;
-                document.getElementById('consentModal').style.display = 'none';
-                document.getElementById('rejectModal').style.display = 'flex';
+                toggleModal('consentModal', false);
+                toggleModal('rejectModal', true);
             });
             
             // Modal de rechazo
             document.getElementById('closeRejectModal').addEventListener('click', function() {
-                document.getElementById('rejectModal').style.display = 'none';
+                toggleModal('rejectModal', false);
             });
             
             // Modal de éxito
             document.getElementById('closeSuccessModal').addEventListener('click', function() {
-                document.getElementById('successModal').style.display = 'none';
+                toggleModal('successModal', false);
             });
             
             // Cerrar modales al hacer clic fuera
             document.querySelectorAll('.modal-overlay').forEach(modal => {
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
-                        modal.style.display = 'none';
+                        toggleModal(modal.id, false);
                     }
                 });
             });
             
+            // Cerrar modales con Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay').forEach(modal => {
+                        if (!modal.hidden) {
+                            toggleModal(modal.id, false);
+                        }
+                    });
+                }
+            });
+            
             // Selección de método de pago por defecto
             selectPaymentMethod('efectivo');
+            
+            // Configurar el formulario
+            document.getElementById('servicioForm').addEventListener('submit', validarYEnviarFormulario);
         });
     </script>
 </body>
