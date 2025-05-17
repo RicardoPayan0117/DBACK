@@ -1,806 +1,1048 @@
-<?php
-// Conexión a la base de datos (comentada para seguridad)
-/*
-$host = 'localhost';          // Servidor de la base de datos
-$dbname = 'empresa_gruas';    // Nombre de la base de datos
-$username = 'tu_usuario';     // Usuario de MySQL
-$password = 'tu_contraseña';  // Contraseña de MySQL
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error de conexión: " . $e->getMessage());
-}
-*/
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gastos - Empresa de Grúas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Reportes de Gastos | Grúas DBACK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 4px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
             padding: 0;
+            background-color: var(--light-color);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filters-panel {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .filters-title {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filters-title i {
+            color: var(--secondary-color);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e9ecef;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .summary-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .description {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 400px !important;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .badge-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            color: #2980b9;
+        }
+
+        .action-btn.delete {
+            color: var(--accent-color);
+        }
+
+        .action-btn.delete:hover {
+            color: #c0392b;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .pagination-btn:hover:not(.active) {
+            background-color: var(--light-color);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-group {
+                min-width: 100%;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+     <style>
+        /* Variables CSS */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --light-color: #f5f5f5;
+            --text-color: #333;
+            --text-light: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
             display: flex;
             min-height: 100vh;
+            background-color: var(--light-color);
+            color: var(--text-color);
         }
-        
-        /* Sidebar styles */
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Sidebar mejorado */
         .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
+            width: 60px;
+            height: 100vh;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            transition: var(--transition);
+            overflow: hidden;
+            position: fixed;
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            position: fixed;
         }
-        
+
+        .sidebar:hover {
+            width: 250px;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.2);
+        }
+
         .sidebar_header {
-            padding: 20px;
+            padding: 15px;
             display: flex;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
+        .sidebar_list {
+            list-style: none;
+            padding: 15px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar_element {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            margin: 5px 10px;
+            border-radius: var(--border-radius);
+        }
+
+        .sidebar_element:hover {
+            background-color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar_element.active {
+            background-color: var(--accent-color);
+        }
+
         .sidebar_icon {
             width: 24px;
             height: 24px;
+            margin-right: 15px;
+            color: var(--text-light);
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .sidebar_icon--logo {
+            width: 30px;
+            height: 30px;
             margin-right: 10px;
         }
-        
-        .sidebar_icon--logo {
-            width: 40px;
-            height: 40px;
-        }
-        
+
         .sidebar_text {
-            font-size: 16px;
-        }
-        
-        .sidebar_list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-        
-        .sidebar_element {
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-        }
-        
-        .sidebar_element:hover {
-            background-color: #34495e;
-        }
-        
-        .sidebar_link {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-        
-        .sidebar_footer {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar_title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .sidebar_info {
             font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            font-weight: 500;
+        }
+
+        .sidebar:hover .sidebar_text {
+            opacity: 1;
+        }
+
+        .sidebar_title {
+            font-size: 16px;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .sidebar_info {
+            font-size: 11px;
             opacity: 0.8;
         }
-        
-        /* Main content styles */
+
+        .sidebar_footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Contenido principal mejorado */
         .main-content {
+            flex: 1;
+            margin-left: 60px;
+            padding: 30px;
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .sidebar:hover ~ .main-content {
             margin-left: 250px;
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             padding: 20px;
-            width: calc(100% - 250px);
-            background-color: #f5f5f5;
+            transition: var(--transition);
         }
-        
-        .container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .section { 
-            margin-bottom: 40px; 
-            border: 1px solid #ddd; 
-            padding: 20px; 
-            border-radius: 5px; 
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
         }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
+
+        /* Mejoras de accesibilidad */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
-        
-        th, td { 
-            padding: 10px; 
-            text-align: left; 
-            border-bottom: 1px solid #ddd; 
+
+        /* Responsive mejorado */
+        @media (max-width: 992px) {
+            .main-content {
+                padding: 20px;
+            }
         }
-        
-        th { 
-            background-color: #f2f2f2; 
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 50px;
+            }
+            
+            .main-content {
+                margin-left: 50px;
+                padding: 15px;
+            }
+            
+            .sidebar:hover {
+                width: 220px;
+            }
+            
+            .sidebar:hover ~ .main-content {
+                margin-left: 220px;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .form-group { 
-            margin-bottom: 15px; 
-        }
-        
-        label { 
-            display: block; 
-            margin-bottom: 5px; 
-        }
-        
-        input, select, textarea { 
-            width: 100%; 
-            padding: 8px; 
-            box-sizing: border-box; 
-        }
-        
-        button { 
-            background-color: #4CAF50; 
-            color: white; 
-            padding: 10px 15px; 
-            border: none; 
-            cursor: pointer; 
-        }
-        
-        button:hover { 
-            background-color: #45a049; 
-        }
-        
-        .success { 
-            color: green; 
-            margin: 10px 0; 
-        }
-        
-        .error { 
-            color: red; 
-            margin: 10px 0; 
-        }
-        
-        .tabs { 
-            display: flex; 
-            margin-bottom: 20px; 
-        }
-        
-        .tab { 
-            padding: 10px 20px; 
-            cursor: pointer; 
-            background-color: #f1f1f1; 
-            margin-right: 5px; 
-        }
-        
-        .tab.active { 
-            background-color: #4CAF50; 
-            color: white; 
-        }
-        
-        .tab-content { 
-            display: none; 
-        }
-        
-        .tab-content.active { 
-            display: block; 
-        }
-        
-        .charts-container { 
-            margin-top: 30px; 
-        }
-        
-        .chart-container { 
-            width: 48%; 
-            display: inline-block; 
-        }
-        
-        .chart-container:last-child { 
-            margin-left: 4%; 
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                bottom: 0;
+                top: auto;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            
+            .sidebar:hover {
+                width: 100%;
+                height: 60px;
+            }
+            
+            .sidebar_header, 
+            .sidebar_footer {
+                display: none;
+            }
+            
+            .sidebar_list {
+                display: flex;
+                padding: 0;
+                flex-grow: 1;
+            }
+            
+            .sidebar_element {
+                flex-direction: column;
+                padding: 10px;
+                margin: 0 5px;
+                min-width: 60px;
+            }
+            
+            .sidebar_icon {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .sidebar_text {
+                font-size: 10px;
+                opacity: 1;
+            }
+            
+            .sidebar:hover .sidebar_text {
+                opacity: 1;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 60px;
+            }
+            
+            .sidebar:hover ~ .main-content {
+                margin-left: 0;
+            }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-   <!-- Barra lateral con efecto de texto emergente -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar_header">
-        <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK">
-        <span class="sidebar_text">Grúas DBACK</span>
-    </div>
-
-    <ul class="sidebar_list">
-        <li class="sidebar_element">
-            <a href="#" class="sidebar_link">
-                <i class="fas fa-home sidebar_icon"></i>
-                <span class="sidebar_text">Inicio</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Gruas.php" class="sidebar_link">
-                <i class="fas fa-truck sidebar_icon"></i>
-                <span class="sidebar_text">Grúas</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Gastos.php" class="sidebar_link">
-                <i class="fas fa-money-bill-wave sidebar_icon"></i>
-                <span class="sidebar_text">Gastos</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Empleados.html" class="sidebar_link">
-                <i class="fas fa-users sidebar_icon"></i>
-                <span class="sidebar_text">Empleados</span>
-            </a>
-        </li>
-
-        <li class="sidebar_element">
-            <a href="#" class="sidebar_link">
-                <i class="fas fa-cog sidebar_icon"></i>
-                <span class="sidebar_text">Configuración</span>
-            </a>
-        </li>
-    </ul>
-
-    <div class="sidebar_footer">
-        <div class="sidebar_element">
-            <i class="fas fa-user-circle sidebar_icon"></i>
-            <div class="sidebar_user-info">
-                <div class="sidebar_text sidebar_title">Ricardo Payán</div>
-                <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
-            </div>
+    <!-- Barra lateral mejorada con ARIA -->
+    <nav class="sidebar" aria-label="Menú principal">
+        <div class="sidebar_header">
+            <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK" width="30" height="30">
+            <span class="sidebar_text">Grúas DBACK</span>
         </div>
-    </div>
-</aside>
 
-<style>
-    /* Estilos para el efecto de texto emergente */
-    .sidebar {
-        width: 70px;
-        position: fixed;
-        height: 100vh;
-        transition: width 0.3s ease;
-        z-index: 1000;
-        overflow: hidden;
-    }
-    
-    .sidebar:hover {
-        width: 250px;
-    }
-    
-    .sidebar_text {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        margin-left: 10px;
-        white-space: nowrap;
-    }
-    
-    .sidebar:hover .sidebar_text {
-        opacity: 1;
-        transition-delay: 0.1s;
-    }
-    
-    .sidebar_element {
-        display: flex;
-        align-items: center;
-    }
-    
-    .sidebar_link {
-        display: flex;
-        align-items: center;
-    }
-    
-    .sidebar_user-info {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        margin-left: 10px;
-    }
-    
-    .sidebar:hover .sidebar_user-info {
-        opacity: 1;
-        transition-delay: 0.1s;
-    }
-    
-    .main-content {
-        margin-left: 70px;
-        transition: margin-left 0.3s ease;
-    }
-    
-    .sidebar:hover ~ .main-content {
-        margin-left: 250px;
-    }
-</style>
-
-<script>
-    // Opcional: Mejorar la experiencia en móviles
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        
-        // Para dispositivos táctiles
-        if ('ontouchstart' in window) {
-            let isExpanded = false;
-            
-            sidebar.addEventListener('click', function(e) {
-                if (e.target.closest('.sidebar_element') || e.target.closest('.sidebar_footer')) {
-                    return; // No hacer nada si se hace clic en un elemento interactivo
-                }
-                
-                isExpanded = !isExpanded;
-                this.style.width = isExpanded ? '250px' : '70px';
-                document.querySelector('.main-content').style.marginLeft = 
-                    isExpanded ? '250px' : '70px';
-            });
-        }
-    });
-</script>
-<!-- Barra lateral con efecto de texto emergente -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar_header">
-        <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK">
-        <span class="sidebar_text">Grúas DBACK</span>
-    </div>
-
-    <ul class="sidebar_list">
-        <li class="sidebar_element">
-            <a href="MenuAdmin.PHP" class="sidebar_link">  <!-- Enlace modificado -->
-                <i class="fas fa-home sidebar_icon"></i>
+        <ul class="sidebar_list" role="menubar">
+            <li class="sidebar_element" role="menuitem" onclick="showSection('dashboard')" tabindex="0" aria-label="Inicio">
+                <i class="fas fa-home sidebar_icon" aria-hidden="true"></i>
                 <span class="sidebar_text">Inicio</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Gruas.php" class="sidebar_link">
-                <i class="fas fa-truck sidebar_icon"></i>
-                <span class="sidebar_text">Grúas</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Gastos.php" class="sidebar_link">
-                <i class="fas fa-money-bill-wave sidebar_icon"></i>
-                <span class="sidebar_text">Gastos</span>
-            </a>
-        </li>
-        
-        <li class="sidebar_element">
-            <a href="Empleados.html" class="sidebar_link">
-                <i class="fas fa-users sidebar_icon"></i>
-                <span class="sidebar_text">Empleados</span>
-            </a>
-        </li>
-
-        
-             <li class="sidebar_element" onclick="showSection('panel-solicitud')">
-                <a href="panel-solicitud.html" class="sidebar_link">
-                    <i class="fas fa-users sidebar_icon"></i>
-                    <span class="sidebar_text">panel-solicitud</span>
+            </li>
+            
+            <li class="sidebar_element" role="menuitem" onclick="showSection('gruas')" tabindex="0" aria-label="Grúas">
+                <a href="Gruas.php" class="sidebar_link">
+                    <i class="fas fa-truck sidebar_icon" aria-hidden="true"></i>
+                    <span class="sidebar_text">Grúas</span>
+                </a>
+            </li>
+            
+            <li class="sidebar_element" role="menuitem" onclick="showSection('gastos')" tabindex="0" aria-label="Gastos">
+                <a href="Gastos.php" class="sidebar_link">
+                    <i class="fas fa-money-bill-wave sidebar_icon" aria-hidden="true"></i>
+                    <span class="sidebar_text">Gastos</span>
+                </a>
+            </li>
+            
+            <li class="sidebar_element" role="menuitem" onclick="showSection('empleados')" tabindex="0" aria-label="Empleados">
+                <a href="Empleados.html" class="sidebar_link">
+                    <i class="fas fa-users sidebar_icon" aria-hidden="true"></i>
+                    <span class="sidebar_text">Empleados</span>
                 </a>
             </li>
 
-    </ul>
+            <li class="sidebar_element" role="menuitem" onclick="showSection('panel-solicitud')" tabindex="0" aria-label="Panel de solicitud">
+                <a href="panel-solicitud.html" class="sidebar_link">
+                    <i class="fas fa-clipboard-list sidebar_icon" aria-hidden="true"></i>
+                    <span class="sidebar_text">Panel de solicitud</span>
+                </a>
+            </li>
+        </ul>
 
-    <div class="sidebar_footer">
-        <div class="sidebar_element">
-            <i class="fas fa-user-circle sidebar_icon"></i>
-            <div class="sidebar_user-info">
-                <div class="sidebar_text sidebar_title">Ricardo Payán</div>
-                <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
-            </div>
-        </div>
-    </div>
-</aside>
-
-<style>
-    /* Estilos para el efecto de texto emergente */
-    .sidebar {
-        width: 70px;
-        position: fixed;
-        height: 100vh;
-        transition: width 0.3s ease;
-        z-index: 1000;
-        overflow: hidden;
-    }
-    
-    .sidebar:hover {
-        width: 250px;
-    }
-    
-    .sidebar_text {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        margin-left: 10px;
-        white-space: nowrap;
-    }
-    
-    .sidebar:hover .sidebar_text {
-        opacity: 1;
-        transition-delay: 0.1s;
-    }
-    
-    .sidebar_element {
-        display: flex;
-        align-items: center;
-    }
-    
-    .sidebar_link {
-        display: flex;
-        align-items: center;
-    }
-    
-    .sidebar_user-info {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        margin-left: 10px;
-    }
-    
-    .sidebar:hover .sidebar_user-info {
-        opacity: 1;
-        transition-delay: 0.1s;
-    }
-    
-    .main-content {
-        margin-left: 70px;
-        transition: margin-left 0.3s ease;
-    }
-    
-    .sidebar:hover ~ .main-content {
-        margin-left: 250px;
-    }
-</style>
-
-<script>
-    // Opcional: Mejorar la experiencia en móviles
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        
-        // Para dispositivos táctiles
-        if ('ontouchstart' in window) {
-            let isExpanded = false;
-            
-            sidebar.addEventListener('click', function(e) {
-                if (e.target.closest('.sidebar_element') || e.target.closest('.sidebar_footer')) {
-                    return; // No hacer nada si se hace clic en un elemento interactivo
-                }
-                
-                isExpanded = !isExpanded;
-                this.style.width = isExpanded ? '250px' : '70px';
-                document.querySelector('.main-content').style.marginLeft = 
-                    isExpanded ? '250px' : '70px';
-            });
-        }
-    });
-</script>
-    <div class="main-content">
-        <div class="container">
-            <h1>Sistema de Gestión de Gastos - Empresa de Grúas</h1>
-            
-            <div class="tabs">
-                <div class="tab active" onclick="openTab('registrar')">Registrar Gasto</div>
-                <div class="tab" onclick="openTab('listar')">Listar Gastos</div>
-                <div class="tab" onclick="openTab('reportes')">Reportes</div>
-            </div>
-            
-            <!-- Sección Registrar Gasto -->
-            <div id="registrar" class="tab-content section active">
-                <h2>Registrar Nuevo Gasto</h2>
-                
-                <form method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="fecha">Fecha:</label>
-                        <input type="date" id="fecha" name="fecha" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="concepto">Concepto:</label>
-                        <input type="text" id="concepto" name="concepto" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="monto">Monto ($):</label>
-                        <input type="number" id="monto" name="monto" step="0.01" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="categoria_id">Categoría:</label>
-                        <select id="categoria_id" name="categoria_id" required>
-                            <option value="">-- Seleccione --</option>
-                            <?php
-                            /*
-                            $stmt = $pdo->query("SELECT id, nombre FROM categorias_gastos ORDER BY nombre");
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='{$row['id']}'>{$row['nombre']}</option>";
-                            }
-                            */
-                            // Datos de ejemplo (simulados)
-                            $categorias = [
-                                ['id' => 1, 'nombre' => 'Combustible'],
-                                ['id' => 2, 'nombre' => 'Mantenimiento'],
-                                ['id' => 3, 'nombre' => 'Seguros'],
-                                ['id' => 4, 'nombre' => 'Peajes'],
-                                ['id' => 5, 'nombre' => 'Personal'],
-                            ];
-                            
-                            foreach ($categorias as $categoria) {
-                                echo "<option value='{$categoria['id']}'>{$categoria['nombre']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="vehiculo_id">Vehículo (opcional):</label>
-                        <select id="vehiculo_id" name="vehiculo_id">
-                            <option value="">-- Seleccione --</option>
-                            <?php
-                            /*
-                            $stmt = $pdo->query("SELECT id, matricula FROM vehiculos ORDER BY matricula");
-                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                echo "<option value='{$row['id']}'>{$row['matricula']}</option>";
-                            }
-                            */
-                            // Datos de ejemplo (simulados)
-                            $vehiculos = [
-                                ['id' => 1, 'matricula' => 'ABC-123'],
-                                ['id' => 2, 'matricula' => 'DEF-456'],
-                                ['id' => 3, 'matricula' => 'GHI-789'],
-                            ];
-                            
-                            foreach ($vehiculos as $vehiculo) {
-                                echo "<option value='{$vehiculo['id']}'>{$vehiculo['matricula']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="descripcion">Descripción:</label>
-                        <textarea id="descripcion" name="descripcion" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="factura">Factura (PDF/Imagen):</label>
-                        <input type="file" id="factura" name="factura" accept=".pdf,.jpg,.jpeg,.png">
-                    </div>
-                    
-                    <button type="submit" name="registrar_gasto">Registrar Gasto</button>
-                </form>
-            </div>
-            
-            <!-- Sección Listar Gastos -->
-            <div id="listar" class="tab-content section">
-                <h2>Listado de Gastos</h2>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Categoría</th>
-                            <th>Vehículo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        /*
-                        $sql = "SELECT g.*, c.nombre as categoria, v.matricula 
-                                FROM gastos g
-                                LEFT JOIN categorias_gastos c ON g.categoria_id = c.id
-                                LEFT JOIN vehiculos v ON g.vehiculo_id = v.id
-                                ORDER BY g.fecha DESC
-                                LIMIT 50";
-                        
-                        $stmt = $pdo->query($sql);
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                            $matricula = isset($row['matricula']) ? $row['matricula'] : 'N/A';
-                            echo "<tr>
-                                    <td>{$row['fecha']}</td>
-                                    <td>{$row['concepto']}</td>
-                                    <td>$" . number_format($row['monto'], 2) . "</td>
-                                    <td>{$row['categoria']}</td>
-                                    <td>{$matricula}</td>
-                                  </tr>";
-                        }
-                        */
-                        // Datos de ejemplo (simulados)
-                        $gastos = [
-                            [
-                                'fecha' => '2023-10-15',
-                                'concepto' => 'Cambio de aceite',
-                                'monto' => 120.50,
-                                'categoria' => 'Mantenimiento',
-                                'matricula' => 'ABC-123'
-                            ],
-                            [
-                                'fecha' => '2023-10-10',
-                                'concepto' => 'Diesel',
-                                'monto' => 85.75,
-                                'categoria' => 'Combustible',
-                                'matricula' => 'DEF-456'
-                            ],
-                            [
-                                'fecha' => '2023-10-05',
-                                'concepto' => 'Seguro mensual',
-                                'monto' => 350.00,
-                                'categoria' => 'Seguros',
-                                'matricula' => null
-                            ],
-                        ];
-                        
-                        foreach ($gastos as $gasto) {
-                            $matricula = isset($gasto['matricula']) ? $gasto['matricula'] : 'N/A';
-                            echo "<tr>
-                                    <td>{$gasto['fecha']}</td>
-                                    <td>{$gasto['concepto']}</td>
-                                    <td>$" . number_format($gasto['monto'], 2) . "</td>
-                                    <td>{$gasto['categoria']}</td>
-                                    <td>{$matricula}</td>
-                                  </tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Sección Reportes -->
-            <div id="reportes" class="tab-content section">
-                <h2>Reportes de Gastos</h2>
-                
-                <form method="get" id="filtro-reporte">
-                    <div class="form-group">
-                        <label for="mes">Mes:</label>
-                        <select id="mes" name="mes">
-                            <?php 
-                            $meses = [
-                                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
-                                5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
-                                9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-                            ];
-                            
-                            foreach ($meses as $num => $nombre) {
-                                $selected = ($num == date('n')) ? 'selected' : '';
-                                echo "<option value='$num' $selected>$nombre</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="ano">Año:</label>
-                        <select id="ano" name="ano">
-                            <?php 
-                            for ($i = date('Y') - 2; $i <= date('Y'); $i++) {
-                                $selected = ($i == date('Y')) ? 'selected' : '';
-                                echo "<option value='$i' $selected>$i</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <button type="button" onclick="generarReporte()">Generar Reporte</button>
-                </form>
-                
-                <div class="charts-container">
-                    <div class="chart-container">
-                        <h3>Gastos por Categoría</h3>
-                        <canvas id="chartCategorias" width="400" height="300"></canvas>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <h3>Gastos por Vehículo</h3>
-                        <canvas id="chartVehiculos" width="400" height="300"></canvas>
-                    </div>
+        <div class="sidebar_footer">
+            <div class="sidebar_element" role="contentinfo">
+                <i class="fas fa-user-circle sidebar_icon" aria-hidden="true"></i>
+                <div>
+                    <div class="sidebar_text sidebar_title">Ricardo Payán</div>
+                    <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
                 </div>
             </div>
         </div>
+    </nav>
+
+    <!-- Contenido principal mejorado -->
+    <main class="main-content" id="main-content">
+     
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-invoice-dollar"></i> Reportes de Gastos</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="exportPdf">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </button>
+                <button class="btn btn-secondary" id="exportExcel">
+                    <i class="fas fa-file-excel"></i> Exportar Excel
+                </button>
+            </div>
+        </div>
+
+        <div class="filters-panel">
+            <h2 class="filters-title"><i class="fas fa-filter"></i> Filtros del Reporte</h2>
+            <form id="reportForm">
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha de Inicio</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha de Fin</label>
+                        <input type="date" id="fecha_fin" name="fecha_fin">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria">
+                            <option value="">Todas las categorías</option>
+                            <option value="Combustible">Combustible</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Peajes">Peajes</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Seguros">Seguros</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label for="vehiculo">Vehículo</label>
+                        <select id="vehiculo" name="vehiculo">
+                            <option value="">Todos los vehículos</option>
+                            <option value="ABC123">ABC123 - Ford F150</option>
+                            <option value="XYZ789">XYZ789 - Chevrolet Silverado</option>
+                            <option value="DEF456">DEF456 - International 4300</option>
+                            <option value="GHI789">GHI789 - Kenworth T800</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="proveedor">Proveedor</label>
+                        <select id="proveedor" name="proveedor">
+                            <option value="">Todos los proveedores</option>
+                            <option value="Estación Shell">Estación Shell</option>
+                            <option value="Taller Mecánico">Taller Mecánico</option>
+                            <option value="Autopista del Norte">Autopista del Norte</option>
+                            <option value="Seguros XYZ">Seguros XYZ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orden">Ordenar por</label>
+                        <select id="orden" name="orden">
+                            <option value="fecha_desc">Fecha (más reciente)</option>
+                            <option value="fecha_asc">Fecha (más antigua)</option>
+                            <option value="monto_desc">Monto (mayor a menor)</option>
+                            <option value="monto_asc">Monto (menor a mayor)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Generar Reporte
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-broom"></i> Limpiar Filtros
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h3><i class="fas fa-dollar-sign"></i> Total Gastado</h3>
+                <div class="value">$5,245.75</div>
+                <div class="description">En el período seleccionado</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-list-ol"></i> Registros</h3>
+                <div class="value">23</div>
+                <div class="description">Transacciones encontradas</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-gas-pump"></i> Combustible</h3>
+                <div class="value">$3,120.50</div>
+                <div class="description">59.5% del total</div>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-tools"></i> Mantenimiento</h3>
+                <div class="value">$1,450.25</div>
+                <div class="description">27.6% del total</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2 class="chart-title"><i class="fas fa-chart-bar"></i> Distribución de Gastos</h2>
+            <canvas id="gastosChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2 class="chart-title"><i class="fas fa-chart-line"></i> Evolución Mensual</h2>
+            <canvas id="evolucionChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <h2><i class="fas fa-table"></i> Detalle de Gastos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                        <th>Categoría</th>
+                        <th>Vehículo</th>
+                        <th>Proveedor</th>
+                        <th>Factura</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>15/05/2023</td>
+                        <td>Gasolina - Estación Shell</td>
+                        <td>$150.00</td>
+                        <td><span class="badge badge-primary">Combustible</span></td>
+                        <td>ABC123 - Ford F150</td>
+                        <td>Estación Shell</td>
+                        <td>FAC-001</td>
+                        <td class="actions-cell">
+                            <button class="action-btn" title="Ver detalle"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>14/05/2023</td>
+                        <td>Cambio de aceite y filtros</td>
+                        <td>$180.00</td>
+                        <td><span class="badge badge-success">Mantenimiento</span></td>
+                        <td>XYZ789 - Chevrolet Silverado</td>
+                        <td>Taller Mecánico</td>
+                        <td>FAC-002</td>
+                        <td class="actions-cell">
+                            <button class="action-btn" title="Ver detalle"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10/05/2023</td>
+                        <td>Peaje autopista</td>
+                        <td>$25.50</td>
+                        <td><span class="badge badge-danger">Peajes</span></td>
+                        <td>ABC123 - Ford F150</td>
+                        <td>Autopista del Norte</td>
+                        <td>P-3456</td>
+                        <td class="actions-cell">
+                            <button class="action-btn" title="Ver detalle"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>08/05/2023</td>
+                        <td>Pago de seguro mensual</td>
+                        <td>$350.00</td>
+                        <td><span class="badge badge-primary">Seguros</span></td>
+                        <td>Todos</td>
+                        <td>Seguros XYZ</td>
+                        <td>SEG-0523</td>
+                        <td class="actions-cell">
+                            <button class="action-btn" title="Ver detalle"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>05/05/2023</td>
+                        <td>Compra de repuestos</td>
+                        <td>$420.75</td>
+                        <td><span class="badge badge-success">Mantenimiento</span></td>
+                        <td>DEF456 - International 4300</td>
+                        <td>Repuestos S.A.</td>
+                        <td>REP-2023-05</td>
+                        <td class="actions-cell">
+                            <button class="action-btn" title="Ver detalle"><i class="fas fa-eye"></i></button>
+                            <button class="action-btn" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button class="pagination-btn"><i class="fas fa-angle-double-left"></i></button>
+                <button class="pagination-btn">1</button>
+                <button class="pagination-btn active">2</button>
+                <button class="pagination-btn">3</button>
+                <button class="pagination-btn"><i class="fas fa-angle-double-right"></i></button>
+            </div>
+        </div>
     </div>
-    
+
     <script>
-        // Funcionalidad de pestañas
-        function openTab(tabName) {
-            const tabs = document.getElementsByClassName('tab');
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].classList.remove('active');
-            }
-            
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
-            
-            document.querySelector(`.tab[onclick="openTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-        }
-        
-        // Generar reporte (simulado)
-        function generarReporte() {
-            // En una implementación real, esto haría una petición AJAX o recargaría la página con los parámetros
-            alert("En un sistema real, esto generaría el reporte con los filtros seleccionados");
-            
-            // Datos de ejemplo para los gráficos
-            const datosCategorias = {
-                labels: ['Combustible', 'Mantenimiento', 'Seguros', 'Peajes', 'Personal'],
-                datasets: [{
-                    data: [1200, 850, 350, 280, 2200],
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-                }]
-            };
-            
-            const datosVehiculos = {
-                labels: ['ABC-123', 'DEF-456', 'GHI-789', 'Sin asignar'],
-                datasets: [{
-                    label: 'Gastos por Vehículo',
-                    data: [850, 1200, 650, 1300],
-                    backgroundColor: '#36A2EB'
-                }]
-            };
-            
-            // Renderizar gráficos
-            renderChart('chartCategorias', 'pie', datosCategorias);
-            renderChart('chartVehiculos', 'bar', datosVehiculos);
-        }
-        
-        // Función para renderizar gráficos
-        function renderChart(canvasId, type, data) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
-            
-            // Destruir el gráfico anterior si existe
-            if (window[canvasId + 'Chart']) {
-                window[canvasId + 'Chart'].destroy();
-            }
-            
-            // Crear nuevo gráfico
-            window[canvasId + 'Chart'] = new Chart(ctx, {
-                type: type,
-                data: data,
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gráfico de distribución de gastos
+            const gastosCtx = document.getElementById('gastosChart').getContext('2d');
+            new Chart(gastosCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Combustible', 'Mantenimiento', 'Peajes', 'Seguros', 'Personal', 'Otros'],
+                    datasets: [{
+                        data: [3120.50, 1450.25, 325.00, 850.00, 300.00, 200.00],
+                        backgroundColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#e74c3c',
+                            '#f39c12',
+                            '#9b59b6',
+                            '#1abc9c'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
                             position: 'right',
-                        }
-                    },
-                    ...(type === 'bar' ? {
-                        scales: {
-                            y: {
-                                beginAtZero: true
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: $${value.toFixed(2)} (${percentage}%)`;
+                                }
                             }
                         }
-                    } : {})
+                    }
                 }
             });
-        }
-        
-        // Generar reporte al cargar la página
-        window.onload = function() {
-            generarReporte();
-        };
+
+            // Gráfico de evolución mensual
+            const evolucionCtx = document.getElementById('evolucionChart').getContext('2d');
+            new Chart(evolucionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [
+                        {
+                            label: 'Combustible',
+                            data: [2800, 2950, 3100, 3020, 3120, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Mantenimiento',
+                            data: [1200, 1350, 1100, 1420, 1450, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Total',
+                            data: [4500, 4800, 4700, 4950, 5245, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolución de Gastos Mensuales 2023'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Monto ($)'
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+
+            // Manejo de eventos
+            document.getElementById('exportPdf').addEventListener('click', function() {
+                alert('Generando reporte en PDF...');
+                // Aquí iría la lógica para generar el PDF
+            });
+
+            document.getElementById('exportExcel').addEventListener('click', function() {
+                alert('Generando reporte en Excel...');
+                // Aquí iría la lógica para generar el Excel
+            });
+
+            // Configuración de fechas por defecto
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            
+            document.getElementById('fecha_inicio').valueAsDate = firstDay;
+            document.getElementById('fecha_fin').valueAsDate = today;
+        });
     </script>
 </body>
 </html>
