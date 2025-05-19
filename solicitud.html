@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Solicita nuestro servicio de grúas 24/7. Asistencia rápida y profesional para todo tipo de vehículos.">
     <title>Solicitar Servicio de Grúa | Grúas DBACK</title>
-    <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
+       <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
 </head>
 <body>
     <header>
         <nav class="navbar" aria-label="Navegación principal">
             <div class="nav-content">
                 <a href="index.html" class="navbar-brand">
-                    <img src="Elementos\LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
+                    <img src="Elementos/LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
                     <h1>Grúas DBACK</h1>
                 </a>
                 
@@ -42,6 +41,7 @@
                                placeholder="Ej: Juan Pérez"
                                title="Ingrese un nombre válido (solo letras y espacios, mínimo 3 caracteres)"
                                aria-required="true">
+                        <div id="nombre-error" class="error-message" role="alert">Por favor ingrese un nombre válido (mínimo 3 caracteres, solo letras y espacios)</div>
                     </div>
 
                     <div class="form-group">
@@ -51,6 +51,7 @@
                                placeholder="Ej: 6681234567 o 668-123-4567"
                                title="Formato requerido: XXXXXXXXXX o XXX-XXX-XXXX"
                                aria-required="true">
+                        <div id="telefono-error" class="error-message" role="alert">Por favor ingrese un teléfono válido (10 dígitos o formato XXX-XXX-XXXX)</div>
                     </div>
 
                     <div class="form-group">
@@ -59,6 +60,7 @@
                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                placeholder="Ej: juan@ejemplo.com"
                                title="Ingrese un correo electrónico válido">
+                        <div id="email-error" class="error-message" role="alert">Por favor ingrese un correo electrónico válido</div>
                     </div>
                 </fieldset>
 
@@ -78,9 +80,10 @@
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
                                        aria-required="true">
                                 <button type="button" id="obtenerUbicacionOrigen" class="location-button" aria-label="Obtener mi ubicación actual">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="" width="20" height="20">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
                                 </button>
                             </div>
+                            <div id="ubicacion_origen-error" class="error-message" role="alert">Por favor ingrese una ubicación válida (mínimo 5 caracteres)</div>
                             <datalist id="ubicaciones_origen"></datalist>
                         </div>
                     </div>
@@ -97,9 +100,10 @@
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
                                        aria-required="true">
                                 <button type="button" id="obtenerUbicacionDestino" class="location-button" aria-label="Obtener mi ubicación actual">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="" width="20" height="20">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
                                 </button>
                             </div>
+                            <div id="ubicacion_destino-error" class="error-message" role="alert">Por favor ingrese una ubicación válida (mínimo 5 caracteres)</div>
                             <datalist id="ubicaciones_destino"></datalist>
                         </div>
                     </div>
@@ -118,6 +122,7 @@
                             <option value="motocicleta">Motocicleta</option>
                             <option value="camion">Camión</option>
                         </select>
+                        <div id="vehiculo-error" class="error-message" role="alert">Por favor seleccione un tipo de vehículo</div>
                     </div>
                     
                     <div class="form-group">
@@ -126,6 +131,7 @@
                                minlength="2"
                                placeholder="Ej: Toyota, Ford, Nissan"
                                aria-required="true">
+                        <div id="marca-error" class="error-message" role="alert">Por favor ingrese la marca del vehículo (mínimo 2 caracteres)</div>
                     </div>
                     
                     <div class="form-group">
@@ -134,12 +140,14 @@
                                minlength="2"
                                placeholder="Ej: Corolla, F-150, Sentra"
                                aria-required="true">
+                        <div id="modelo-error" class="error-message" role="alert">Por favor ingrese el modelo del vehículo (mínimo 2 caracteres)</div>
                     </div>
 
                     <div class="form-group">
                         <label for="foto">Foto del vehículo (opcional):</label>
                         <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
                         <p><small>Formatos aceptados: JPG, PNG. Tamaño máximo: 5MB</small></p>
+                        <div id="foto-error" class="error-message" role="alert">El archivo debe ser una imagen (JPG o PNG) y no exceder 5MB</div>
                     </div>
                 </fieldset>
 
@@ -158,6 +166,7 @@
                             <option value="arranque">Servicio de arranque</option>
                             <option value="otro">Otro servicio</option>
                         </select>
+                        <div id="tipo_servicio-error" class="error-message" role="alert">Por favor seleccione un tipo de servicio</div>
                     </div>
 
                     <div class="form-group">
@@ -166,6 +175,7 @@
                                   minlength="10" maxlength="500"
                                   placeholder="Describa brevemente la situación"
                                   title="La descripción debe tener entre 10 y 500 caracteres"></textarea>
+                        <div id="descripcion-error" class="error-message" role="alert">La descripción debe tener entre 10 y 500 caracteres</div>
                     </div>
 
                     <div class="form-group">
@@ -279,11 +289,15 @@
                 <div id="privacy-container" class="privacy-checkbox-container">
                     <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true">
                     <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span></span></label>
+                    <div id="consentimiento-error" class="error-message" role="alert">Debe aceptar la política de privacidad para continuar</div>
                 </div>
                 
                 <!-- Botones de acción -->
                 <div class="action-buttons">
-                    <button type="submit" class="cta-button" id="submit-button">Enviar Solicitud</button>
+                    <button type="submit" class="cta-button" id="submit-button">
+                        <span id="submit-text">Enviar Solicitud</span>
+                        <span id="submit-spinner" class="loading-spinner"></span>
+                    </button>
                 </div>
             </form>
             
@@ -364,17 +378,138 @@
         let costoTotalServicio = 0;
         let paypalButtonsInitialized = false;
         
+        // Función para validar un campo
+        function validarCampo(campoId, mensajeErrorId, validacionFn) {
+            const campo = document.getElementById(campoId);
+            const mensajeError = document.getElementById(mensajeErrorId);
+            
+            if (!validacionFn(campo)) {
+                campo.classList.add('input-error');
+                campo.classList.remove('input-success');
+                campo.setAttribute('aria-invalid', 'true');
+                mensajeError.style.display = 'block';
+                return false;
+            } else {
+                campo.classList.remove('input-error');
+                campo.classList.add('input-success');
+                campo.setAttribute('aria-invalid', 'false');
+                mensajeError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        // Funciones de validación específicas
+        function validarNombre(campo) {
+            const regex = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}$/;
+            return regex.test(campo.value);
+        }
+        
+        function validarTelefono(campo) {
+            const regex = /^(\d{10}|\d{3}-\d{3}-\d{4})$/;
+            return regex.test(campo.value);
+        }
+        
+        function validarEmail(campo) {
+            if (!campo.value) return true; // Opcional
+            const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+            return regex.test(campo.value);
+        }
+        
+        function validarUbicacion(campo) {
+            return campo.value.length >= 5;
+        }
+        
+        function validarSelect(campo) {
+            return campo.value !== "";
+        }
+        
+        function validarTexto(campo) {
+            return campo.value.length >= campo.minLength;
+        }
+        
+        function validarDescripcion(campo) {
+            return campo.value.length >= 10 && campo.value.length <= 500;
+        }
+        
+        function validarFoto(campo) {
+            if (!campo.files.length) return true; // Opcional
+            
+            const file = campo.files[0];
+            const tiposPermitidos = ['image/jpeg', 'image/png'];
+            const tamanoMaximo = 5 * 1024 * 1024; // 5MB
+            
+            if (!tiposPermitidos.includes(file.type)) {
+                return false;
+            }
+            
+            if (file.size > tamanoMaximo) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Función para validar todos los campos del formulario
+        function validarFormulario() {
+            let valido = true;
+            
+            // Validar información de contacto
+            valido = validarCampo('nombre', 'nombre-error', validarNombre) && valido;
+            valido = validarCampo('telefono', 'telefono-error', validarTelefono) && valido;
+            valido = validarCampo('email', 'email-error', validarEmail) && valido;
+            
+            // Validar ubicaciones
+            valido = validarCampo('ubicacion_origen', 'ubicacion_origen-error', validarUbicacion) && valido;
+            valido = validarCampo('ubicacion_destino', 'ubicacion_destino-error', validarUbicacion) && valido;
+            
+            // Validar información del vehículo
+            valido = validarCampo('vehiculo', 'vehiculo-error', validarSelect) && valido;
+            valido = validarCampo('marca', 'marca-error', validarTexto) && valido;
+            valido = validarCampo('modelo', 'modelo-error', validarTexto) && valido;
+            valido = validarCampo('foto', 'foto-error', validarFoto) && valido;
+            
+            // Validar detalles del servicio
+            valido = validarCampo('tipo_servicio', 'tipo_servicio-error', validarSelect) && valido;
+            valido = validarCampo('descripcion', 'descripcion-error', validarDescripcion) && valido;
+            
+            // Validar consentimiento
+            const consentimiento = document.getElementById('consentimiento');
+            const consentimientoError = document.getElementById('consentimiento-error');
+            
+            if (!consentimiento.checked) {
+                consentimientoError.style.display = 'block';
+                valido = false;
+            } else {
+                consentimientoError.style.display = 'none';
+            }
+            
+            // Validar método de pago si hay costo
+            if (costoTotalServicio > 0) {
+                const metodoPago = document.getElementById('metodo_pago_seleccionado').value;
+                if (metodoPago === 'paypal' && !document.getElementById('paypal_order_id').value) {
+                    alert('Por favor complete el pago con PayPal antes de enviar el formulario');
+                    valido = false;
+                }
+            }
+            
+            return valido;
+        }
+        
         // Función para obtener la ubicación actual
         function obtenerUbicacionActual(destino = false) {
             const inputId = destino ? 'ubicacion_destino' : 'ubicacion_origen';
             const ubicacionInput = document.getElementById(inputId);
+            const errorId = destino ? 'ubicacion_destino-error' : 'ubicacion_origen-error';
+            const errorElement = document.getElementById(errorId);
             
             if (!navigator.geolocation) {
-                alert("La geolocalización no es soportada por tu navegador");
+                errorElement.textContent = "La geolocalización no es soportada por tu navegador";
+                errorElement.style.display = 'block';
                 return;
             }
             
             ubicacionInput.placeholder = "Obteniendo ubicación...";
+            ubicacionInput.disabled = true;
             
             navigator.geolocation.getCurrentPosition(
                 function(position) {
@@ -384,6 +519,8 @@
                     
                     // Simulamos la obtención de dirección
                     ubicacionInput.value = coordenadas;
+                    validarCampo(inputId, errorId, validarUbicacion);
+                    ubicacionInput.disabled = false;
                     
                     // Calcular distancia si ambas ubicaciones están completas
                     if (document.getElementById('ubicacion_origen').value && 
@@ -394,20 +531,23 @@
                 function(error) {
                     console.error("Error al obtener la ubicación:", error);
                     ubicacionInput.placeholder = "Dirección o punto de referencia";
+                    ubicacionInput.disabled = false;
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            alert("Permiso denegado para acceder a la ubicación");
+                            errorElement.textContent = "Permiso denegado para acceder a la ubicación";
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            alert("La información de ubicación no está disponible");
+                            errorElement.textContent = "La información de ubicación no está disponible";
                             break;
                         case error.TIMEOUT:
-                            alert("Tiempo de espera agotado al obtener la ubicación");
+                            errorElement.textContent = "Tiempo de espera agotado al obtener la ubicación";
                             break;
                         default:
-                            alert("Error desconocido al obtener la ubicación");
+                            errorElement.textContent = "Error desconocido al obtener la ubicación";
                     }
+                    
+                    errorElement.style.display = 'block';
                 },
                 {
                     enableHighAccuracy: true,
@@ -640,22 +780,39 @@
         function validarYEnviarFormulario(event) {
             event.preventDefault();
             
+            // Mostrar spinner de carga
+            document.getElementById('submit-text').style.display = 'none';
+            document.getElementById('submit-spinner').style.display = 'inline-block';
+            document.getElementById('submit-button').disabled = true;
+            
+            // Validar todos los campos
+            const formularioValido = validarFormulario();
+            
+            if (!formularioValido) {
+                // Ocultar spinner y habilitar botón
+                document.getElementById('submit-text').style.display = 'inline-block';
+                document.getElementById('submit-spinner').style.display = 'none';
+                document.getElementById('submit-button').disabled = false;
+                
+                // Desplazarse al primer error
+                const primerError = document.querySelector('.input-error');
+                if (primerError) {
+                    primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    primerError.focus();
+                }
+                
+                return false;
+            }
+            
             // Verificar consentimiento
             if (!document.getElementById('consentimiento').checked) {
                 document.getElementById('rejectModal').hidden = false;
-                return false;
-            }
-            
-            // Verificar método de pago seleccionado
-            const metodoPago = document.getElementById('metodo_pago_seleccionado').value;
-            if (!metodoPago) {
-                alert('Por favor seleccione un método de pago');
-                return false;
-            }
-            
-            // Si es PayPal, verificar que el pago se completó
-            if (metodoPago === 'paypal' && !document.getElementById('paypal_order_id').value) {
-                alert('Por favor complete el pago con PayPal antes de enviar el formulario');
+                
+                // Ocultar spinner y habilitar botón
+                document.getElementById('submit-text').style.display = 'inline-block';
+                document.getElementById('submit-spinner').style.display = 'none';
+                document.getElementById('submit-button').disabled = false;
+                
                 return false;
             }
             
@@ -673,15 +830,22 @@
         // Función para manejar el modal de consentimiento
         function toggleModal(modalId, show) {
             const modal = document.getElementById(modalId);
-            modal.hidden = !show;
             
             if (show) {
+                modal.hidden = false;
                 modal.setAttribute('aria-hidden', 'false');
                 // Enfocar el primer elemento interactivo del modal
                 const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
                 if (focusable) focusable.focus();
+                
+                // Deshabilitar scroll del body
+                document.body.style.overflow = 'hidden';
             } else {
+                modal.hidden = true;
                 modal.setAttribute('aria-hidden', 'true');
+                
+                // Habilitar scroll del body
+                document.body.style.overflow = '';
             }
         }
 
@@ -700,9 +864,53 @@
             document.getElementById('ubicacion_origen').addEventListener('change', calcularDistancia);
             document.getElementById('ubicacion_destino').addEventListener('change', calcularDistancia);
             
-            // Actualizar información cuando cambian los campos
-            document.getElementById('nombre').addEventListener('input', actualizarInfoUsuario);
-            document.getElementById('email').addEventListener('input', actualizarInfoUsuario);
+            // Validación en tiempo real para campos de texto
+            document.getElementById('nombre').addEventListener('blur', function() {
+                validarCampo('nombre', 'nombre-error', validarNombre);
+                actualizarInfoUsuario();
+            });
+            
+            document.getElementById('telefono').addEventListener('blur', function() {
+                validarCampo('telefono', 'telefono-error', validarTelefono);
+            });
+            
+            document.getElementById('email').addEventListener('blur', function() {
+                validarCampo('email', 'email-error', validarEmail);
+                actualizarInfoUsuario();
+            });
+            
+            document.getElementById('ubicacion_origen').addEventListener('blur', function() {
+                validarCampo('ubicacion_origen', 'ubicacion_origen-error', validarUbicacion);
+            });
+            
+            document.getElementById('ubicacion_destino').addEventListener('blur', function() {
+                validarCampo('ubicacion_destino', 'ubicacion_destino-error', validarUbicacion);
+            });
+            
+            document.getElementById('marca').addEventListener('blur', function() {
+                validarCampo('marca', 'marca-error', validarTexto);
+            });
+            
+            document.getElementById('modelo').addEventListener('blur', function() {
+                validarCampo('modelo', 'modelo-error', validarTexto);
+            });
+            
+            document.getElementById('descripcion').addEventListener('blur', function() {
+                validarCampo('descripcion', 'descripcion-error', validarDescripcion);
+            });
+            
+            document.getElementById('foto').addEventListener('change', function() {
+                validarCampo('foto', 'foto-error', validarFoto);
+            });
+            
+            // Validación para selects
+            document.getElementById('vehiculo').addEventListener('change', function() {
+                validarCampo('vehiculo', 'vehiculo-error', validarSelect);
+            });
+            
+            document.getElementById('tipo_servicio').addEventListener('change', function() {
+                validarCampo('tipo_servicio', 'tipo_servicio-error', validarSelect);
+            });
             
             // Modal de consentimiento
             document.getElementById('openConsentModal').addEventListener('click', function(e) {
