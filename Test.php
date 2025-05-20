@@ -1,3 +1,7 @@
+<?php
+require_once 'includes/conexion.php';
+require_once 'includes/header.php';
+?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -6,19 +10,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Solicita nuestro servicio de grúas 24/7. Asistencia rápida y profesional para todo tipo de vehículos.">
     <title>Solicitar Servicio de Grúa | Grúas DBACK</title>
-       <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
+    <link rel="stylesheet" href="assets/css/Solicitud_ARCO.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
         <nav class="navbar" aria-label="Navegación principal">
             <div class="nav-content">
-                <a href="index.html" class="navbar-brand">
-                    <img src="Elementos/LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
+                <a href="index.php" class="navbar-brand">
+                    <img src="assets/img/LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
                     <h1>Grúas DBACK</h1>
                 </a>
                 
                 <div class="nav-links">
-                    <a href="index.html" class="cta-button">Inicio</a>
+                    <a href="index.php" class="cta-button">Inicio</a>
                     <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
                 </div>
             </div>
@@ -30,7 +35,7 @@
             <h2 id="form-title">Solicitar Servicio de Grúa</h2>
             <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
             
-            <form action="procesar_servicio.php" method="post" id="servicioForm" novalidate>
+            <form action="procesar_solicitud.php" method="post" id="servicioForm" novalidate enctype="multipart/form-data">
                 <!-- Información de contacto -->
                 <fieldset>
                     <legend>Información de contacto</legend>
@@ -81,7 +86,7 @@
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
                                        aria-required="true">
                                 <button type="button" id="obtenerUbicacionOrigen" class="location-button" aria-label="Obtener mi ubicación actual">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
+                                    <i class="fas fa-map-marker-alt"></i>
                                 </button>
                             </div>
                             <div id="ubicacion_origen-error" class="error-message" role="alert">Por favor ingrese una ubicación válida (mínimo 5 caracteres)</div>
@@ -101,7 +106,7 @@
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
                                        aria-required="true">
                                 <button type="button" id="obtenerUbicacionDestino" class="location-button" aria-label="Obtener mi ubicación actual">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
+                                    <i class="fas fa-map-marker-alt"></i>
                                 </button>
                             </div>
                             <div id="ubicacion_destino-error" class="error-message" role="alert">Por favor ingrese una ubicación válida (mínimo 5 caracteres)</div>
@@ -289,7 +294,7 @@
                 <!-- Checkbox para confirmar consentimiento -->
                 <div id="privacy-container" class="privacy-checkbox-container">
                     <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true">
-                    <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span></span></label>
+                    <label for="consentimiento"><span class="privacy-text">He leído y acepto la <a href="politica-privacidad.php" class="privacy-link">política de privacidad</a></span></label>
                     <div id="consentimiento-error" class="error-message" role="alert">Debe aceptar la política de privacidad para continuar</div>
                 </div>
                 
@@ -305,64 +310,6 @@
             <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
         </section>
 
-        <!-- Modal de política de privacidad -->
-        <div id="consentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="consentModalTitle" hidden>
-            <div class="modal-container">
-                <button class="close-modal" id="closeModal" aria-label="Cerrar modal">&times;</button>
-                
-                <div class="header-decoration">
-                    <h1 id="consentModalTitle">Consentimiento de Datos Personales</h1>
-                </div>
-                
-                <div class="modal-content">
-                    <p>Por este medio, expreso y otorgo mi consentimiento a Grúas DBACK en la recopilación, almacenamiento y uso de mis datos personales, con los fines relacionados con la prestación y uso de los servicios prestados por Grúas DBACK, tales como solicitudes de asistencia, el seguimiento de vehículos atendidos y la emisión de recibos o facturas de pago correspondiente.</p>
-                    
-                    <h2>Datos personales recopilados</h2>
-                    <ul>
-                        <li>Nombre completo</li>
-                        <li>Domicilio</li>
-                        <li>Número de teléfono</li>
-                        <li>Correo electrónico</li>
-                        <li>Datos del vehículo</li>
-                        <li>Información de la solicitud de servicio</li>
-                        <li>Ubicación del servicio</li>
-                        <li>Fecha y hora de la solicitud</li>
-                    </ul>
-                    
-                    <h2>Tratamiento de datos</h2>
-                    <p>La información recopilada será tratada en estricto apego a lo establecido por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y será utilizada exclusivamente para los fines mencionados.</p>
-                    
-                    <h2>Medios de contacto de Grúas DBACK para ejercer mis derechos ARCO</h2>
-                    <p>Para más información sobre los derechos ARCO, visita: <a href="https://www.gob.mx/cms/uploads/attachment/file/428335/DDP_Gu_a_derechos_ARCO_13Dic18.pdf" target="_blank">Guía Derechos ARCO</a></p>
-                    <p>Correo electrónico: <a href="mailto:protecciondedatos@gruasdback.com">protecciondedatos@gruasdback.com</a></p>
-                    <p>Teléfono: <a href="tel:6688132905">668 813 2905</a></p>
-                    <p>Dirección: Manuel Castro Elizalde 895 SUR, Luis Donaldo Colosio, Colón, 81233 Los Mochis, Sin.</p>
-                    
-                    <h2>Consentimiento</h2>
-                    <p>Al hacer clic en "Aceptar", confirmo que he leído y comprendido los términos de esta autorización y que otorgo mi consentimiento para el tratamiento de mis datos personales a Grúas DBACK.</p>
-                    
-                    <div class="button-container">
-                        <button class="button" id="acceptConsent">Aceptar</button>
-                        <button class="button button-reject" id="rejectConsent">Rechazar</button>
-                    </div>
-                </div>
-                
-                <div class="footer-decoration">
-                    <p>Grúas DBACK - Documento de Consentimiento de Datos Personales</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal de notificación de rechazo -->
-        <div id="rejectModal" class="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="rejectModalTitle" hidden>
-            <div class="small-modal-container">
-                <h2 id="rejectModalTitle">Consentimiento Requerido</h2>
-                <p>Debe aceptar la política de privacidad para utilizar nuestros servicios. 
-                    No podemos procesar su solicitud sin su consentimiento para el tratamiento de datos personales.</p>
-                <button class="notification-button" id="closeRejectModal">Entendido</button>
-            </div>
-        </div>
-        
         <!-- Modal de éxito al enviar -->
         <div id="successModal" class="success-modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="successModalTitle" hidden>
             <div class="success-modal-container">
@@ -374,6 +321,7 @@
         </div>
     </main>
 
+    <script src="assets/js/scripts.js"></script>
     <script>
         // Variables globales
         let costoTotalServicio = 0;
@@ -828,16 +776,15 @@
             return true;
         }
 
-        // Función para manejar el modal de consentimiento
-        function toggleModal(modalId, show) {
-            const modal = document.getElementById(modalId);
+        // Función para manejar el modal de éxito
+        function toggleSuccessModal(show) {
+            const modal = document.getElementById('successModal');
             
             if (show) {
                 modal.hidden = false;
                 modal.setAttribute('aria-hidden', 'false');
-                // Enfocar el primer elemento interactivo del modal
-                const focusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                if (focusable) focusable.focus();
+                // Enfocar el botón de aceptar
+                document.getElementById('closeSuccessModal').focus();
                 
                 // Deshabilitar scroll del body
                 document.body.style.overflow = 'hidden';
@@ -913,57 +860,9 @@
                 validarCampo('tipo_servicio', 'tipo_servicio-error', validarSelect);
             });
             
-            // Modal de consentimiento
-            document.getElementById('openConsentModal').addEventListener('click', function(e) {
-                e.preventDefault();
-                toggleModal('consentModal', true);
-            });
-            
-            document.getElementById('closeModal').addEventListener('click', function() {
-                toggleModal('consentModal', false);
-            });
-            
-            document.getElementById('acceptConsent').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('consentimiento').checked = true;
-                toggleModal('consentModal', false);
-            });
-            
-            document.getElementById('rejectConsent').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.getElementById('consentimiento').checked = false;
-                toggleModal('consentModal', false);
-                toggleModal('rejectModal', true);
-            });
-            
-            // Modal de rechazo
-            document.getElementById('closeRejectModal').addEventListener('click', function() {
-                toggleModal('rejectModal', false);
-            });
-            
             // Modal de éxito
             document.getElementById('closeSuccessModal').addEventListener('click', function() {
-                toggleModal('successModal', false);
-            });
-            
-            // Cerrar modales al hacer clic fuera
-            document.querySelectorAll('.modal-overlay').forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        toggleModal(modal.id, false);
-                    }
-                });
-            });
-            
-            // Cerrar modales con Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal-overlay').forEach(modal => {
-                        if (!modal.hidden) {
-                            toggleModal(modal.id, false);
-                        }
-                    });
-                }
+                toggleSuccessModal(false);
             });
             
             // Selección de método de pago por defecto

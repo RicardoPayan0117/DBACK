@@ -1,5 +1,5 @@
 <?php
-session_save_path('C:\php\php_sessiones');
+session_start(); // Inicio de sesión
 
 // Variable para el mensaje de conexión
 $connectionMessage = "";
@@ -55,8 +55,22 @@ if (isset($_POST['Login'])) {
             $passwordResult = $conn->query($checkPassword);
             
             if ($passwordResult->num_rows > 0) {
-                // Usuario y contraseña correctos, iniciar sesión
-                header("Refresh: 2; url=MenuAdmin.PHP");  // Redirigir después de 2 segundos
+                // Usuario y contraseña correctos, obtenemos los datos del usuario
+                $userData = $passwordResult->fetch_assoc();
+                
+                // Guardar datos del usuario en la sesión
+                $_SESSION['usuario_id'] = $userData['ID'];
+                $_SESSION['usuario_nombre'] = $userData['NOMBRE'];
+                $_SESSION['usuario_cargo'] = $userData['CARGO']; // Asumiendo que existe un campo CARGO
+                $_SESSION['usuario_usuario'] = $userData['USUARIO'];
+                
+                // Si no existe el campo CARGO, podemos usar un valor por defecto
+                if (!isset($userData['CARGO'])) {
+                    $_SESSION['usuario_cargo'] = 'Usuario del Sistema';
+                }
+                
+                // Redirigir al menú de administración
+                header("Refresh: 2; url=MenuAdmin.PHP");
                 exit(); // Terminar el script después de la redirección
             } else {
                 // Contraseña incorrecta
@@ -143,4 +157,4 @@ if (isset($conn) && $conn instanceof mysqli) {
         </form>
     </div>
 </body>
-</html>
+</html> 
