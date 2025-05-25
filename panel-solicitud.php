@@ -108,9 +108,10 @@ $result = $conn->query($query);
                 <select id="filtroEstado" name="estado" class="form-select">
                   <option value="">Todos</option>
                   <option value="pendiente" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'pendiente') ? 'selected' : ''; ?>>Pendiente</option>
-                  <option value="proceso" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'proceso') ? 'selected' : ''; ?>>En proceso</option>
-                  <option value="completado" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'completado') ? 'selected' : ''; ?>>Completado</option>
-                  <option value="cancelado" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'cancelado') ? 'selected' : ''; ?>>Cancelado</option>
+                  <option value="asignada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'asignada') ? 'selected' : ''; ?>>Asignada</option>
+                  <option value="en_proceso" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'en_proceso') ? 'selected' : ''; ?>>En proceso</option>
+                  <option value="completada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'completada') ? 'selected' : ''; ?>>Completada</option>
+                  <option value="cancelada" <?php echo (isset($_GET['estado']) && $_GET['estado'] == 'cancelada') ? 'selected' : ''; ?>>Cancelada</option>
                 </select>
               </div>
               <div class="col-md-4">
@@ -144,6 +145,11 @@ $result = $conn->query($query);
         <div class="card-body p-0">
           <?php if ($result->num_rows > 0): ?>
             <?php while ($solicitud = $result->fetch_assoc()): ?>
+              <?php 
+                // Asegurarse de que los valores existan antes de mostrarlos
+                $distancia = isset($solicitud['distancia']) ? $solicitud['distancia'] : null;
+                $costo = isset($solicitud['costo']) ? $solicitud['costo'] : null;
+              ?>
               <article class="request-card card mb-3 status-<?php echo str_replace('_', '-', $solicitud['estado']); ?>" data-status="<?php echo $solicitud['estado']; ?>" data-fecha="<?php echo date('Y-m-d', strtotime($solicitud['fecha_solicitud'])); ?>">
                 <div class="card-body">
                   <div class="row align-items-center">
@@ -155,8 +161,8 @@ $result = $conn->query($query);
                       </h3>
                       <ul class="list-unstyled mb-0">
                         <li><i class="bi bi-calendar3 request-icon"></i> <strong>Fecha:</strong> <?php echo date('Y-m-d H:i', strtotime($solicitud['fecha_solicitud'])); ?></li>
-                        <li><i class="bi bi-pin-map request-icon"></i> <strong>Distancia:</strong> <?php echo $solicitud['distancia'] ? $solicitud['distancia'] . ' km' : 'No especificada'; ?></li>
-                        <li><i class="bi bi-currency-dollar request-icon"></i> <strong>Costo:</strong> <?php echo $solicitud['costo'] ? '$' . number_format($solicitud['costo'], 2) . ' MXN' : 'Por determinar'; ?></li>
+                        <li><i class="bi bi-pin-map request-icon"></i> <strong>Distancia:</strong> <?php echo $distancia ? $distancia . ' km' : 'No especificada'; ?></li>
+                        <li><i class="bi bi-currency-dollar request-icon"></i> <strong>Costo:</strong> <?php echo $costo ? '$' . number_format($costo, 2) . ' MXN' : 'Por determinar'; ?></li>
                         <li><i class="bi bi-tools request-icon"></i> <strong>Tipo:</strong> <?php echo ucfirst(str_replace('_', ' ', $solicitud['tipo_servicio'])); ?> - <strong>Urgencia:</strong> <?php echo ucfirst($solicitud['urgencia']); ?></li>
                       </ul>
                     </div>
@@ -170,6 +176,9 @@ $result = $conn->query($query);
                             $badge_icon = 'bi-hourglass-split';
                             break;
                           case 'asignada':
+                            $badge_class = 'bg-info text-white';
+                            $badge_icon = 'bi-person-check';
+                            break;
                           case 'en_proceso':
                             $badge_class = 'bg-primary';
                             $badge_icon = 'bi-arrow-repeat';
@@ -182,6 +191,9 @@ $result = $conn->query($query);
                             $badge_class = 'bg-danger';
                             $badge_icon = 'bi-x-circle';
                             break;
+                          default:
+                            $badge_class = 'bg-secondary';
+                            $badge_icon = 'bi-question-circle';
                         }
                       ?>
                       <span class="badge rounded-pill <?php echo $badge_class; ?> mb-2">
@@ -191,8 +203,8 @@ $result = $conn->query($query);
                         <button class="btn btn-sm btn-outline-primary" onclick="verDetalles(
                           '<?php echo addslashes($solicitud['cliente_nombre']); ?>',
                           '<?php echo addslashes($solicitud['cliente_telefono']); ?>',
-                          '<?php echo addslashes($solicitud['distancia']); ?>',
-                          '<?php echo addslashes($solicitud['costo']); ?>',
+                          '<?php echo addslashes($distancia); ?>',
+                          '<?php echo addslashes($costo); ?>',
                           '<?php echo date('Y-m-d H:i', strtotime($solicitud['fecha_solicitud'])); ?>',
                           '<?php echo addslashes(ucfirst(str_replace('_', ' ', $solicitud['tipo_servicio']))); ?>',
                           '<?php echo addslashes(ucfirst($solicitud['urgencia'])); ?>'
