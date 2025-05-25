@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apartado de Empleados</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-           <link rel="stylesheet" href=".\CSS\Empleados.CSS">
-
-    
+    <link rel="stylesheet" href="./CSS/Empleados.CSS">
 </head>
 <body>
     <!-- Barra lateral con efecto de texto emergente -->
@@ -19,7 +17,7 @@
 
         <ul class="sidebar_list">
             <li class="sidebar_element">
-                <a href="MenuAdmin.PHP" class="sidebar_link">  <!-- Enlace modificado -->
+                <a href="MenuAdmin.PHP" class="sidebar_link">
                     <i class="fas fa-home sidebar_icon"></i>
                     <span class="sidebar_text">Inicio</span>
                 </a>
@@ -40,19 +38,19 @@
             </li>
             
             <li class="sidebar_element">
-                <a href="Empleados.html" class="sidebar_link">
+                <a href="Empleados.php" class="sidebar_link">
                     <i class="fas fa-users sidebar_icon"></i>
                     <span class="sidebar_text">Empleados</span>
                 </a>
             </li>
 
-           <li class="sidebar_element" onclick="showSection('panel-solicitud')">
+            <li class="sidebar_element" onclick="showSection('panel-solicitud')">
                 <a href="panel-solicitud.html" class="sidebar_link">
                     <i class="fas fa-users sidebar_icon"></i>
                     <span class="sidebar_text">panel-solicitud</span>
                 </a>
             </li>
-
+        </ul>
 
         <div class="sidebar_footer">
             <div class="sidebar_element">
@@ -152,18 +150,10 @@
     </div>
     
     <script>
-        // Datos de ejemplo de empleados
-        let employees = [
-            { id: 1, firstName: "Juan", lastName: "Pérez", email: "juan.perez@ejemplo.com", department: "IT", salary: 35000 },
-            { id: 2, firstName: "María", lastName: "González", email: "maria.gonzalez@ejemplo.com", department: "Recursos Humanos", salary: 32000 },
-            { id: 3, firstName: "Carlos", lastName: "Rodríguez", email: "carlos.rodriguez@ejemplo.com", department: "Marketing", salary: 30000 },
-            { id: 4, firstName: "Ana", lastName: "Martínez", email: "ana.martinez@ejemplo.com", department: "Ventas", salary: 38000 },
-            { id: 5, firstName: "Roberto", lastName: "López", email: "roberto.lopez@ejemplo.com", department: "Finanzas", salary: 40000 }
-        ];
-        
         // Variables para paginación
         const recordsPerPage = 5;
         let currentPage = 1;
+        let totalEmployees = 0;
         
         // Referencias a elementos DOM
         const employeesList = document.getElementById('employeesList');
@@ -177,20 +167,36 @@
         const modalTitle = document.getElementById('modalTitle');
         const sidebar = document.getElementById('sidebar');
         
+        // Función para cargar empleados desde la base de datos
+        async function loadEmployees(page = 1, searchTerm = '') {
+            try {
+                const response = await fetch(`empleados_api.php?action=get_employees&page=${page}&search=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayEmployees(data.employees, page, data.total);
+                } else {
+                    console.error('Error al cargar empleados:', data.message);
+                    employeesList.innerHTML = '<tr><td colspan="7" style="text-align: center">Error al cargar empleados</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                employeesList.innerHTML = '<tr><td colspan="7" style="text-align: center">Error de conexión</td></tr>';
+            }
+        }
+        
         // Función para mostrar empleados
-        function displayEmployees(page = 1, employeesArray = employees) {
+        function displayEmployees(employees, page = 1, total = 0) {
             employeesList.innerHTML = '';
+            totalEmployees = total;
             
-            const start = (page - 1) * recordsPerPage;
-            const end = start + recordsPerPage;
-            const paginatedEmployees = employeesArray.slice(start, end);
-            
-            if (paginatedEmployees.length === 0) {
+            if (employees.length === 0) {
                 employeesList.innerHTML = '<tr><td colspan="7" style="text-align: center">No se encontraron empleados</td></tr>';
+                setupPagination(page, 0);
                 return;
             }
             
-            paginatedEmployees.forEach(employee => {
+            employees.forEach(employee => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${employee.id}</td>
@@ -211,7 +217,7 @@
             setupActionButtons();
             
             // Configurar paginación
-            setupPagination(employeesArray);
+            setupPagination(page, total);
         }
         
         // Configurar botones de acción (editar, eliminar)
@@ -237,9 +243,11 @@
         }
         
         // Configurar paginación
-        function setupPagination(employeesArray) {
+        function setupPagination(currentPage, totalRecords) {
             pagination.innerHTML = '';
-            const pageCount = Math.ceil(employeesArray.length / recordsPerPage);
+            const pageCount = Math.ceil(totalRecords / recordsPerPage);
+            
+            if (pageCount <= 1) return;
             
             // Botón anterior
             const prevBtn = document.createElement('button');
@@ -247,24 +255,60 @@
             prevBtn.disabled = currentPage === 1;
             prevBtn.addEventListener('click', () => {
                 if (currentPage > 1) {
-                    currentPage--;
-                    displayEmployees(currentPage, employeesArray);
+                    loadEmployees(currentPage - 1, searchInput.value);
                 }
             });
             pagination.appendChild(prevBtn);
             
             // Botones de página
-            for (let i = 1; i <= pageCount; i++) {
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(pageCount, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            if (startPage > 1) {
+                const firstPageBtn = document.createElement('button');
+                firstPageBtn.innerText = '1';
+                firstPageBtn.addEventListener('click', () => {
+                    loadEmployees(1, searchInput.value);
+                });
+                pagination.appendChild(firstPageBtn);
+                
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.innerText = '...';
+                    pagination.appendChild(ellipsis);
+                }
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.innerText = i;
                 if (i === currentPage) {
                     pageBtn.classList.add('current-page');
                 }
                 pageBtn.addEventListener('click', () => {
-                    currentPage = i;
-                    displayEmployees(currentPage, employeesArray);
+                    loadEmployees(i, searchInput.value);
                 });
                 pagination.appendChild(pageBtn);
+            }
+            
+            if (endPage < pageCount) {
+                if (endPage < pageCount - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.innerText = '...';
+                    pagination.appendChild(ellipsis);
+                }
+                
+                const lastPageBtn = document.createElement('button');
+                lastPageBtn.innerText = pageCount;
+                lastPageBtn.addEventListener('click', () => {
+                    loadEmployees(pageCount, searchInput.value);
+                });
+                pagination.appendChild(lastPageBtn);
             }
             
             // Botón siguiente
@@ -273,8 +317,7 @@
             nextBtn.disabled = currentPage === pageCount;
             nextBtn.addEventListener('click', () => {
                 if (currentPage < pageCount) {
-                    currentPage++;
-                    displayEmployees(currentPage, employeesArray);
+                    loadEmployees(currentPage + 1, searchInput.value);
                 }
             });
             pagination.appendChild(nextBtn);
@@ -289,30 +332,56 @@
         }
         
         // Editar empleado
-        function editEmployee(id) {
-            modalTitle.innerText = 'Editar Empleado';
-            const employee = employees.find(emp => emp.id === id);
-            
-            if (employee) {
-                document.getElementById('employeeId').value = employee.id;
-                document.getElementById('firstName').value = employee.firstName;
-                document.getElementById('lastName').value = employee.lastName;
-                document.getElementById('email').value = employee.email;
-                document.getElementById('department').value = employee.department;
-                document.getElementById('salary').value = employee.salary;
+        async function editEmployee(id) {
+            try {
+                const response = await fetch(`empleados_api.php?action=get_employee&id=${id}`);
+                const data = await response.json();
                 
-                modal.style.display = 'block';
+                if (data.success) {
+                    modalTitle.innerText = 'Editar Empleado';
+                    document.getElementById('employeeId').value = data.employee.id;
+                    document.getElementById('firstName').value = data.employee.firstName;
+                    document.getElementById('lastName').value = data.employee.lastName;
+                    document.getElementById('email').value = data.employee.email;
+                    document.getElementById('department').value = data.employee.department;
+                    document.getElementById('salary').value = data.employee.salary;
+                    
+                    modal.style.display = 'block';
+                } else {
+                    alert('Error al cargar empleado: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión al cargar empleado');
             }
         }
         
         // Eliminar empleado
-        function deleteEmployee(id) {
-            employees = employees.filter(emp => emp.id !== id);
-            displayEmployees(currentPage);
+        async function deleteEmployee(id) {
+            try {
+                const response = await fetch('empleados_api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `action=delete_employee&id=${id}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadEmployees(currentPage, searchInput.value);
+                } else {
+                    alert('Error al eliminar empleado: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión al eliminar empleado');
+            }
         }
         
         // Guardar empleado (añadir o actualizar)
-        function saveEmployee(e) {
+        async function saveEmployee(e) {
             e.preventDefault();
             
             const id = document.getElementById('employeeId').value;
@@ -322,58 +391,44 @@
             const department = document.getElementById('department').value;
             const salary = parseFloat(document.getElementById('salary').value);
             
-            if (id) {
-                // Actualizar empleado existente
-                const index = employees.findIndex(emp => emp.id === parseInt(id));
-                if (index !== -1) {
-                    employees[index] = {
-                        id: parseInt(id),
-                        firstName,
-                        lastName,
-                        email,
-                        department,
-                        salary
-                    };
-                }
-            } else {
-                // Añadir nuevo empleado
-                const newId = employees.length > 0 ? Math.max(...employees.map(emp => emp.id)) + 1 : 1;
-                employees.push({
-                    id: newId,
-                    firstName,
-                    lastName,
-                    email,
-                    department,
-                    salary
-                });
-            }
+            const formData = new FormData();
+            formData.append('action', id ? 'update_employee' : 'add_employee');
+            if (id) formData.append('id', id);
+            formData.append('firstName', firstName);
+            formData.append('lastName', lastName);
+            formData.append('email', email);
+            formData.append('department', department);
+            formData.append('salary', salary);
             
-            modal.style.display = 'none';
-            displayEmployees(currentPage);
+            try {
+                const response = await fetch('empleados_api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    modal.style.display = 'none';
+                    loadEmployees(currentPage, searchInput.value);
+                } else {
+                    alert('Error al guardar empleado: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión al guardar empleado');
+            }
         }
         
         // Buscar empleados
         function searchEmployees() {
-            const searchTerm = searchInput.value.toLowerCase();
-            if (searchTerm.trim() === '') {
-                displayEmployees(1);
-                return;
-            }
-            
-            const filteredEmployees = employees.filter(emp => 
-                emp.firstName.toLowerCase().includes(searchTerm) ||
-                emp.lastName.toLowerCase().includes(searchTerm) ||
-                emp.email.toLowerCase().includes(searchTerm) ||
-                emp.department.toLowerCase().includes(searchTerm)
-            );
-            
             currentPage = 1;
-            displayEmployees(currentPage, filteredEmployees);
+            loadEmployees(currentPage, searchInput.value);
         }
         
         // Event Listeners
         window.addEventListener('load', () => {
-            displayEmployees();
+            loadEmployees();
         });
         
         addEmployeeBtn.addEventListener('click', showAddModal);

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Solicita nuestro servicio de grúas 24/7. Asistencia rápida y profesional para todo tipo de vehículos.">
     <title>Solicitar Servicio de Grúa | Grúas DBACK</title>
-       <link rel="stylesheet" href=".\CSS\Solicitud_ARCO.CSS">
+    <link rel="stylesheet" href="CSS/Solicitud_ARCO.css">
+    
 </head>
 <body>
     <header>
@@ -30,7 +30,7 @@
             <h2 id="form-title">Solicitar Servicio de Grúa</h2>
             <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
             
-            <form action="procesar_servicio.php" method="post" id="servicioForm" novalidate>
+            <form action="procesar_servicio.php" method="post" id="servicioForm" enctype="multipart/form-data" novalidate>
                 <!-- Información de contacto -->
                 <fieldset>
                     <legend>Información de contacto</legend>
@@ -213,7 +213,7 @@
                     </div>
                     <div class="summary-row">
                         <span>Correo:</span>
-                        <span id="display-email">(Por completar)</span>
+                        <span id="display-email">(No especificado)</span>
                     </div>
                     <div class="summary-row">
                         <span>Distancia estimada:</span>
@@ -294,14 +294,9 @@
                 </div>
                 
                 <!-- Botones de acción -->
-                <div class="action-buttons">
-                    <button type="submit" class="cta-button" id="submit-button">
-                        <span id="submit-text">Enviar Solicitud</span>
-                        <span id="submit-spinner" class="loading-spinner"></span>
-                    </button>
-                </div>
-            </form>
-            
+              <div class="action-buttons">
+    <button type="submit" class="cta-button">Enviar Solicitud</button>
+</div>
             <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
         </section>
 
@@ -648,6 +643,11 @@
             
             // Guardar el método seleccionado en el campo oculto
             document.getElementById('metodo_pago_seleccionado').value = method;
+            
+            // Cargar PayPal si es necesario
+            if (method === 'paypal' && costoTotalServicio > 0) {
+                loadPayPalScript();
+            }
         }
 
         // Función para cargar el SDK de PayPal

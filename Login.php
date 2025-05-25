@@ -1,89 +1,114 @@
 <?php
-session_start(); // Inicio de sesión
+// Función para crear la base de datos y tablas si no existen
+function initializeDatabase($conn) {
+    // Crear la base de datos si no existe
+    $conn->query("CREATE DATABASE IF NOT EXISTS DBACK");
+    $conn->select_db("DBACK");
+    
+    // Crear tabla de usuarios si no existe
+    $conn->query("CREATE TABLE IF NOT EXISTS usuarios (
+        ID INT AUTO_INCREMENT PRIMARY KEY,
+        NOMBRE VARCHAR(50) NOT NULL,
+        USUARIO VARCHAR(30) NOT NULL UNIQUE,
+        CONTRASEÑA VARCHAR(100) NOT NULL,
+        CARGO VARCHAR(50) NOT NULL,
+        FECHA_CREACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    
+    // Verificar si ya existen usuarios
+    $result = $conn->query("SELECT COUNT(*) as total FROM usuarios");
+    $row = $result->fetch_assoc();
+    
+    if ($row['total'] == 0) {
+        // Insertar usuarios iniciales
+        $conn->query("INSERT INTO usuarios (NOMBRE, USUARIO, CONTRASEÑA, CARGO) VALUES
+            ('Paya Rodríguez', 'paya', SHA1('paya123'), 'Administrador'),
+            ('Angel Gómez', 'angel', SHA1('angel123'), 'Supervisor'),
+            ('Humberto López', 'humberto', SHA1('humberto123'), 'Operador'),
+            ('María Fernández', 'maria', SHA1('maria123'), 'Contadora'),
+            ('Carlos Mendez', 'carlos', SHA1('carlos123'), 'Técnico')");
+    }
+}
 
-// Variable para el mensaje de conexión
-$connectionMessage = "";
-$connectionStatus = false;
+session_start();
 
-// Conectar a la base de datos al cargar la página
+// Configuración de conexión
 $servername = "localhost";
 $username = "root";
-$password = "5211";  
+$password = "5211";
 $dbname = "DBACK";
 
-// Variable para manejar la conexión sin detener la ejecución
-try {
-    // Crear la conexión
-    $conn = new mysqli($servername, $username, $password, $dbname);
+$connectionMessage = "";
+$connectionStatus = false;
+$userErrorMessage = "";
+$passwordErrorMessage = "";
+$lastUsername = "";
 
-    // Verificar la conexión
+try {
+    // Conexión sin seleccionar base de datos primero
+    $conn = new mysqli($servername, $username, $password);
+    
     if ($conn->connect_error) {
-        $connectionMessage = "<p style='color: red; text-align: center; margin-bottom: 20px;'>Error de Conexión: " . $conn->connect_error . "</p>";
-        $connectionStatus = false;
-    } else {
-        $connectionMessage = "<p style='color: green; text-align: center; margin-bottom: 20px;'>Conexión Exitosa a la Base de Datos</p>";
-        $connectionStatus = true;
+        throw new Exception("Error de conexión: " . $conn->connect_error);
     }
+    
+    // Inicializar la base de datos
+    initializeDatabase($conn);
+    
+    // Reconectar específicamente a DBACK
+    $conn->close();
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    $connectionStatus = true;
+    
+    // Procesar login si se envió el formulario
+    if (isset($_POST['Login'])) {
+        $usuario = $conn->real_escape_string($_POST['IngresarUsuario']);
+        $clave = $conn->real_escape_string($_POST['IngresarContraseña']);
+        $lastUsername = $usuario;
+        
+        // Verificar usuario
+        $stmt = $conn->prepare("SELECT * FROM usuarios WHERE USUARIO = ?");
+        $stmt->bind_param("s", $usuario);
+        $stmt->execute();
+        $userResult = $stmt->get_result();
+        
+        if ($userResult->num_rows > 0) {
+            // Verificar contraseña
+            $stmt = $conn->prepare("SELECT * FROM usuarios WHERE USUARIO = ? AND CONTRASEÑA = SHA1(?)");
+            $stmt->bind_param("ss", $usuario, $clave);
+            $stmt->execute();
+            $passwordResult = $stmt->get_result();
+            
+            if ($passwordResult->num_rows > 0) {
+                $userData = $passwordResult->fetch_assoc();
+                $_SESSION['usuario_id'] = $userData['ID'];
+                $_SESSION['usuario_nombre'] = $userData['NOMBRE'];
+                $_SESSION['usuario_cargo'] = $userData['CARGO'];
+                $_SESSION['usuario_usuario'] = $userData['USUARIO'];
+                
+                // Redirigir después de 2 segundos
+                echo "<script>
+                    setTimeout(function() {
+                        window.location.href = 'MenuAdmin.php';
+                    }, 2000);
+                </script>";
+                $connectionMessage = "<p style='color: green; text-align: center;'>Login exitoso! Redirigiendo...</p>";
+            } else {
+                $passwordErrorMessage = "Contraseña incorrecta.";
+            }
+        } else {
+            $userErrorMessage = "El usuario no existe.";
+        }
+        $stmt->close();
+    }
+    
 } catch (Exception $e) {
-    $connectionMessage = "<p style='color: red; text-align: center; margin-bottom: 20px;'>Error al conectar: " . $e->getMessage() . "</p>";
+    $connectionMessage = "<p style='color: red; text-align: center;'>Error: " . $e->getMessage() . "</p>";
     $connectionStatus = false;
 }
 
-// Inicializar las variables para los mensajes
-$userErrorMessage = "";
-$passwordErrorMessage = "";
-$lastUsername = ""; // Variable para mantener el último nombre de usuario
-
-// Procesar el formulario de inicio de sesión
-if (isset($_POST['Login'])) {
-    // Solo intentar consultas si la conexión es exitosa
-    if ($connectionStatus) {
-        // Obtener los valores del formulario
-        $usuario = $_POST['IngresarUsuario'];
-        $clave = $_POST['IngresarContraseña'];
-        
-        // Guardar el nombre de usuario para mantenerlo en caso de error
-        $lastUsername = $usuario;
-
-        // Primero verificamos si el usuario existe
-        $checkUser = "SELECT * FROM usuarios WHERE USUARIO = '$usuario'";
-        $userResult = $conn->query($checkUser);
-
-        if ($userResult->num_rows > 0) {
-            // El usuario existe, ahora verificamos la contraseña
-            $checkPassword = "SELECT * FROM usuarios WHERE USUARIO = '$usuario' AND CONTRASEÑA = '$clave'";
-            $passwordResult = $conn->query($checkPassword);
-            
-            if ($passwordResult->num_rows > 0) {
-                // Usuario y contraseña correctos, obtenemos los datos del usuario
-                $userData = $passwordResult->fetch_assoc();
-                
-                // Guardar datos del usuario en la sesión
-                $_SESSION['usuario_id'] = $userData['ID'];
-                $_SESSION['usuario_nombre'] = $userData['NOMBRE'];
-                $_SESSION['usuario_cargo'] = $userData['CARGO']; // Asumiendo que existe un campo CARGO
-                $_SESSION['usuario_usuario'] = $userData['USUARIO'];
-                
-                // Si no existe el campo CARGO, podemos usar un valor por defecto
-                if (!isset($userData['CARGO'])) {
-                    $_SESSION['usuario_cargo'] = 'Usuario del Sistema';
-                }
-                
-                // Redirigir al menú de administración
-                header("Refresh: 2; url=MenuAdmin.PHP");
-                exit(); // Terminar el script después de la redirección
-            } else {
-                // Contraseña incorrecta
-                $passwordErrorMessage = "<p style='color: red; margin-top: 5px; font-size: 0.8em;'> Contraseña incorrecta.</p>";
-            }
-        } else {
-            // Usuario no encontrado
-            $userErrorMessage = "<p style='color: red; margin-top: 5px; font-size: 0.8em;'> El usuario no existe.</p>";
-        }
-    }
-}
-
-// Cerrar la conexión si está abierta
+// Cerrar conexión al final
 if (isset($conn) && $conn instanceof mysqli) {
     $conn->close();
 }
@@ -94,62 +119,174 @@ if (isset($conn) && $conn instanceof mysqli) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grúas DBACK-Login</title>
+    <title>Grúas DBACK - Login</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
-    <link rel="stylesheet" href=".\CSS\Login.CSS">
     <style>
-        .connection-error {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 50px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 20px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .forgot-password a {
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #1a252f;
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
+        }
+        
+        .connection-message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <!-- Header del login -->
         <div class="login-header">
             <div class="logo">
                 <i class="fas fa-truck-pickup"></i>
             </div>
             <h1>Grúas D'BACK</h1>
         </div>
-
-        <!-- Mostrar mensaje de conexión -->
-        <?php 
-        if (!$connectionStatus) {
-            echo "<div class='connection-error'>
-                    <strong>Error de Conexión</strong>
-                    <p>No se pudo establecer conexión con la base de datos. Verifique sus credenciales.</p>
-                  </div>";
-        }
-        ?>
-
-        <!-- Formulario de login -->
+        
+        <?php if (!empty($connectionMessage)): ?>
+            <div class="connection-message <?php echo $connectionStatus ? 'success' : 'error'; ?>">
+                <?php echo $connectionMessage; ?>
+            </div>
+        <?php endif; ?>
+        
         <form action="" method="post">
             <div class="input-group">
                 <div class="input-icon">
                     <i class="fas fa-user"></i>
                 </div>
                 <input type="text" name="IngresarUsuario" placeholder="Usuario" value="<?php echo htmlspecialchars($lastUsername); ?>" required>
-                <?php if (!empty($userErrorMessage)) echo $userErrorMessage; ?>
+                <?php if (!empty($userErrorMessage)): ?>
+                    <div class="error-message"><?php echo $userErrorMessage; ?></div>
+                <?php endif; ?>
             </div>
-
+            
             <div class="input-group">
                 <div class="input-icon">
                     <i class="fas fa-lock"></i>
                 </div>
                 <input type="password" name="IngresarContraseña" placeholder="Contraseña" required>
-                <?php if (!empty($passwordErrorMessage)) echo $passwordErrorMessage; ?>
+                <?php if (!empty($passwordErrorMessage)): ?>
+                    <div class="error-message"><?php echo $passwordErrorMessage; ?></div>
+                <?php endif; ?>
             </div>
-
+            
             <div class="forgot-password">
                 <a href="#">¿Olvidaste tu contraseña?</a>
             </div>
-
+            
             <button type="submit" name="Login" <?php echo $connectionStatus ? '' : 'disabled'; ?>>
                 <i class="fas fa-sign-in-alt"></i>
                 Iniciar Sesión
@@ -157,4 +294,4 @@ if (isset($conn) && $conn instanceof mysqli) {
         </form>
     </div>
 </body>
-</html> 
+</html>

@@ -4,63 +4,540 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Grúas</title>
-    <link rel="stylesheet" href=".\CSS\Gruas.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-   
+    
+    <style>
+        /* Estilos CSS (se mantienen igual) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f5f5f5;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            transition: all 0.3s;
+            overflow-y: auto;
+        }
+
+        .sidebar_header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar_icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .sidebar_text {
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .sidebar_list {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar_element {
+            margin-bottom: 5px;
+        }
+
+        .sidebar_link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar_link:hover {
+            background-color: #34495e;
+        }
+
+        .sidebar_footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar_user-info {
+            margin-left: 10px;
+        }
+
+        .sidebar_title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .sidebar_info {
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #3498db;
+            text-decoration: none;
+            margin-bottom: 15px;
+        }
+
+        .back-button svg {
+            color: currentColor;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* Action Button */
+        .action-button-container {
+            margin-bottom: 20px;
+        }
+
+        .main-action-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .main-action-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-width: 250px;
+        }
+
+        .search-box button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filters select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+        }
+
+        /* Table */
+        .cranes-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.Activa {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.Mantenimiento {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.Inactiva {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        #saveBtn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            list-style: none;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tabs li {
+            padding: 10px 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tabs li.active {
+            color: #3498db;
+        }
+
+        .tabs li.active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar_text {
+                display: none;
+            }
+            .sidebar_icon {
+                margin-right: 0;
+            }
+            .sidebar_header {
+                justify-content: center;
+            }
+            .sidebar_link {
+                justify-content: center;
+            }
+            .sidebar_user-info {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .filter-controls {
+                flex-direction: column;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .search-box input {
+                flex-grow: 1;
+                min-width: auto;
+            }
+            .filters {
+                width: 100%;
+            }
+            .filters select {
+                flex-grow: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Barra lateral con efecto de texto emergente -->
+    <!-- Barra lateral -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar_header">
-            <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK">
+            <i class="fas fa-crane sidebar_icon"></i>
             <span class="sidebar_text">Grúas DBACK</span>
         </div>
 
-        <ul class="sidebar_list">
-            <li class="sidebar_element">
-                <a href="#" class="sidebar_link">
-                    <i class="fas fa-home sidebar_icon"></i>
-                    <span class="sidebar_text">Inicio</span>
-                </a>
-            </li>
-            
-            <li class="sidebar_element">
-                <a href="Gruas.php" class="sidebar_link">
-                    <i class="fas fa-truck sidebar_icon"></i>
-                    <span class="sidebar_text">Grúas</span>
-                </a>
-            </li>
-            
-            <li class="sidebar_element">
-                <a href="Gastos.php" class="sidebar_link">
-                    <i class="fas fa-money-bill-wave sidebar_icon"></i>
-                    <span class="sidebar_text">Gastos</span>
-                </a>
-            </li>
-            
-            <li class="sidebar_element">
-                <a href="Empleados.html" class="sidebar_link">
-                    <i class="fas fa-users sidebar_icon"></i>
-                    <span class="sidebar_text">Empleados</span>
-                </a>
-            </li>
+       
+    <ul class="sidebar_list" role="menubar">
+      <li class="sidebar_element" role="menuitem">
+        <a href="MenuAdmin.PHP" class="sidebar_link">
+          <i class="bi bi-house sidebar_icon"></i>
+          <span class="sidebar_text">Inicio</span>
+        </a>
+      </li>
+      
+      <li class="sidebar_element" role="menuitem">
+        <a href="Gruas.php" class="sidebar_link">
+          <i class="bi bi-truck sidebar_icon"></i>
+          <span class="sidebar_text">Grúas</span>
+        </a>
+      </li>
+      
+      <li class="sidebar_element" role="menuitem">
+        <a href="Gastos.php" class="sidebar_link">
+          <i class="bi bi-cash-coin sidebar_icon"></i>
+          <span class="sidebar_text">Gastos</span>
+        </a>
+      </li>
+      
+      <li class="sidebar_element" role="menuitem">
+        <a href="Empleados.html" class="sidebar_link">
+          <i class="bi bi-people sidebar_icon"></i>
+          <span class="sidebar_text">Empleados</span>
+        </a>
+      </li>
 
-            
-             <li class="sidebar_element" onclick="showSection('panel-solicitud')">
-                <a href="panel-solicitud.html" class="sidebar_link">
-                    <i class="fas fa-users sidebar_icon"></i>
-                    <span class="sidebar_text">panel-solicitud</span>
-                </a>
-            </li>
+      <li class="sidebar_element active" role="menuitem" aria-current="page">
+        <a href="panel-solicitud.html" class="sidebar_link">
+          <i class="bi bi-clipboard2-check sidebar_icon"></i>
+          <span class="sidebar_text">Panel de Solicitud</span>
+        </a>
+      </li>
+    </ul>
 
-        </ul>
 
         <div class="sidebar_footer">
             <div class="sidebar_element">
                 <i class="fas fa-user-circle sidebar_icon"></i>
                 <div class="sidebar_user-info">
-                    <div class="sidebar_text sidebar_title">Ricardo Payán</div>
-                    <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
+                    <div class="sidebar_text sidebar_title">Administrador</div>
+                    <div class="sidebar_text sidebar_info">Sistema de Grúas</div>
                 </div>
             </div>
         </div>
@@ -70,7 +547,7 @@
         <div class="container">
             <header>
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <a href="MenuAdmin.php" class="back-button">
+                    <a href="#" class="back-button">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -89,20 +566,20 @@
                     <div class="number" id="totalCranes">0</div>
                 </div>
                 <div class="stat-card">
-                    <h3>Grúas Disponibles</h3>
+                    <h3>Grúas Activas</h3>
                     <div class="number" id="availableCranes">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>En Operación</h3>
-                    <div class="number" id="inUseCranes">0</div>
                 </div>
                 <div class="stat-card">
                     <h3>En Mantenimiento</h3>
                     <div class="number" id="maintenanceCranes">0</div>
                 </div>
+                <div class="stat-card">
+                    <h3>Inactivas</h3>
+                    <div class="number" id="inactiveCranes">0</div>
+                </div>
             </div>
             
-            <!-- Nuevo botón destacado para añadir grúas -->
+            <!-- Botón para añadir grúas -->
             <div class="action-button-container">
                 <button id="addCraneBtn" class="main-action-button">
                     <i class="fas fa-plus"></i>
@@ -112,23 +589,22 @@
             
             <div class="filter-controls">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Buscar por ID o modelo...">
+                    <input type="text" id="searchInput" placeholder="Buscar por placa o modelo...">
                     <button id="searchBtn">Buscar</button>
                 </div>
                 
                 <div class="filters">
                     <select id="statusFilter">
                         <option value="all">Todos los estados</option>
-                        <option value="available">Disponible</option>
-                        <option value="in-use">En operación</option>
-                        <option value="maintenance">En mantenimiento</option>
+                        <option value="Activa">Activa</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Inactiva">Inactiva</option>
                     </select>
                     <select id="typeFilter">
                         <option value="all">Todos los tipos</option>
-                        <option value="torre">Grúa Torre</option>
-                        <option value="movil">Grúa Móvil</option>
-                        <option value="telescopica">Grúa Telescópica</option>
-                        <option value="portuaria">Grúa Portuaria</option>
+                        <option value="Plataforma">Plataforma</option>
+                        <option value="Arrastre">Arrastre</option>
+                        <option value="Remolque">Remolque</option>
                     </select>
                 </div>
             </div>
@@ -138,12 +614,11 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Placa</th>
+                            <th>Marca</th>
                             <th>Modelo</th>
                             <th>Tipo</th>
-                            <th>Capacidad (ton)</th>
-                            <th>Ubicación</th>
                             <th>Estado</th>
-                            <th>Próx. Mantenimiento</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -167,51 +642,34 @@
                     <input type="hidden" id="craneId">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="model">Modelo:</label>
-                            <input type="text" id="model" required>
+                            <label for="placa">Placa:</label>
+                            <input type="text" id="placa" required maxlength="7">
                         </div>
                         <div class="form-group">
-                            <label for="type">Tipo:</label>
-                            <select id="type" required>
+                            <label for="marca">Marca:</label>
+                            <input type="text" id="marca" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modelo">Modelo:</label>
+                            <input type="text" id="modelo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo:</label>
+                            <select id="tipo" required>
                                 <option value="">Seleccionar...</option>
-                                <option value="torre">Grúa Torre</option>
-                                <option value="movil">Grúa Móvil</option>
-                                <option value="telescopica">Grúa Telescópica</option>
-                                <option value="portuaria">Grúa Portuaria</option>
+                                <option value="Plataforma">Plataforma</option>
+                                <option value="Arrastre">Arrastre</option>
+                                <option value="Remolque">Remolque</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="capacity">Capacidad (ton):</label>
-                            <input type="number" id="capacity" min="0" step="0.1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="manufacturer">Fabricante:</label>
-                            <input type="text" id="manufacturer" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="year">Año de fabricación:</label>
-                            <input type="number" id="year" min="1900" max="2099" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Estado:</label>
-                            <select id="status" required>
+                            <label for="estado">Estado:</label>
+                            <select id="estado" required>
                                 <option value="">Seleccionar...</option>
-                                <option value="available">Disponible</option>
-                                <option value="in-use">En operación</option>
-                                <option value="maintenance">En mantenimiento</option>
+                                <option value="Activa">Activa</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                                <option value="Inactiva">Inactiva</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="location">Ubicación:</label>
-                            <input type="text" id="location" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nextMaintenance">Próximo mantenimiento:</label>
-                            <input type="date" id="nextMaintenance" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="notes">Notas adicionales:</label>
-                            <textarea id="notes"></textarea>
                         </div>
                     </div>
                     <button type="submit" id="saveBtn">Guardar</button>
@@ -229,7 +687,6 @@
                     <ul class="tabs">
                         <li class="active" data-tab="info">Información</li>
                         <li data-tab="maintenance">Historial de Mantenimiento</li>
-                        <li data-tab="operations">Historial de Operaciones</li>
                     </ul>
                 </div>
                 
@@ -240,46 +697,29 @@
                             <p id="detail-id"></p>
                         </div>
                         <div class="form-group">
+                            <label>Placa:</label>
+                            <p id="detail-placa"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Marca:</label>
+                            <p id="detail-marca"></p>
+                        </div>
+                        <div class="form-group">
                             <label>Modelo:</label>
-                            <p id="detail-model"></p>
+                            <p id="detail-modelo"></p>
                         </div>
                         <div class="form-group">
                             <label>Tipo:</label>
-                            <p id="detail-type"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Capacidad:</label>
-                            <p id="detail-capacity"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Fabricante:</label>
-                            <p id="detail-manufacturer"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Año de fabricación:</label>
-                            <p id="detail-year"></p>
+                            <p id="detail-tipo"></p>
                         </div>
                         <div class="form-group">
                             <label>Estado actual:</label>
-                            <p id="detail-status"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Ubicación:</label>
-                            <p id="detail-location"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Próximo mantenimiento:</label>
-                            <p id="detail-nextMaintenance"></p>
-                        </div>
-                        <div class="form-group full-width">
-                            <label>Notas adicionales:</label>
-                            <p id="detail-notes"></p>
+                            <p id="detail-estado"></p>
                         </div>
                     </div>
                     
                     <div class="actions">
                         <button id="editFromDetails" class="edit-btn">Editar</button>
-                        <button id="scheduleMaintenanceBtn">Programar Mantenimiento</button>
                     </div>
                 </div>
                 
@@ -288,12 +728,6 @@
                     
                     <div class="maintenance-log" id="maintenanceLog">
                         <!-- Historial de mantenimiento se cargará aquí -->
-                    </div>
-                </div>
-                
-                <div id="operations" class="tab-content">
-                    <div class="maintenance-log" id="operationsLog">
-                        <!-- Historial de operaciones se cargará aquí -->
                     </div>
                 </div>
             </div>
@@ -327,13 +761,9 @@
                         <label for="maintenanceCost">Costo:</label>
                         <input type="number" id="maintenanceCost" min="0" step="0.01">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group full-width">
                         <label for="maintenanceDetails">Detalles del Mantenimiento:</label>
                         <textarea id="maintenanceDetails" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="nextMaintenanceUpdate">Próximo Mantenimiento:</label>
-                        <input type="date" id="nextMaintenanceUpdate" required>
                     </div>
                     <button type="submit" id="saveMaintenanceBtn">Guardar</button>
                 </form>
@@ -341,20 +771,11 @@
         </div>
     </div>
 
-    <script src="Gruas.js"></script>
     <script>
-        // Datos de ejemplo de grúas
-        let cranes = [
-            { id: 1, model: "T-1000", type: "torre", capacity: 10, manufacturer: "Liebherr", year: 2020, status: "available", location: "Almacén Central", nextMaintenance: "2023-12-15", notes: "Nueva adquisición" },
-            { id: 2, model: "M-500", type: "movil", capacity: 5, manufacturer: "Terex", year: 2019, status: "in-use", location: "Obra Norte", nextMaintenance: "2023-11-20", notes: "Requiere revisión de frenos" },
-            { id: 3, model: "TL-800", type: "telescopica", capacity: 8, manufacturer: "Manitowoc", year: 2021, status: "maintenance", location: "Taller", nextMaintenance: "2023-12-01", notes: "En reparación de motor" },
-            { id: 4, model: "P-2000", type: "portuaria", capacity: 20, manufacturer: "Konecranes", year: 2018, status: "available", location: "Puerto Este", nextMaintenance: "2024-01-10", notes: "Recién mantenida" },
-            { id: 5, model: "T-1200", type: "torre", capacity: 12, manufacturer: "Liebherr", year: 2022, status: "in-use", location: "Obra Sur", nextMaintenance: "2023-11-30", notes: "Funcionando perfectamente" }
-        ];
-
         // Variables para paginación
-        const recordsPerPage = 5;
+        const recordsPerPage = 10;
         let currentPage = 1;
+        let gruas = [];
 
         // Referencias a elementos DOM
         const cranesList = document.getElementById('cranesList');
@@ -373,429 +794,509 @@
         const modalTitle = document.getElementById('modalTitle');
         const detailsTitle = document.getElementById('detailsTitle');
         const editFromDetailsBtn = document.getElementById('editFromDetails');
-        const scheduleMaintenanceBtn = document.getElementById('scheduleMaintenanceBtn');
         const addMaintenanceBtn = document.getElementById('addMaintenanceBtn');
         const tabs = document.querySelectorAll('.tabs li');
         const tabContents = document.querySelectorAll('.tab-content');
-        const sidebar = document.getElementById('sidebar');
+        const totalCranesElement = document.getElementById('totalCranes');
+        const availableCranesElement = document.getElementById('availableCranes');
+        const maintenanceCranesElement = document.getElementById('maintenanceCranes');
+        const inactiveCranesElement = document.getElementById('inactiveCranes');
 
-        // Función para mostrar grúas
-        function displayCranes(page = 1, cranesArray = cranes) {
+        // Función para cargar las grúas desde el servidor
+        async function fetchGruas() {
+            try {
+                const estado = statusFilter.value;
+                const tipo = typeFilter.value;
+                const busqueda = searchInput.value;
+                
+                const response = await fetch(`api.php?action=getGruas&estado=${estado}&tipo=${tipo}&busqueda=${encodeURIComponent(busqueda)}`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener las grúas');
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                gruas = data.gruas || [];
+                displayGruas(currentPage);
+                updateStats();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar las grúas: ' + error.message);
+            }
+        }
+
+        // Función para actualizar las estadísticas
+        async function updateStats() {
+            try {
+                const response = await fetch('api.php?action=getStats');
+                if (!response.ok) {
+                    throw new Error('Error al obtener estadísticas');
+                }
+                
+                const stats = await response.json();
+                if (stats.error) {
+                    throw new Error(stats.error);
+                }
+                
+                totalCranesElement.textContent = stats.total;
+                availableCranesElement.textContent = stats.activas;
+                maintenanceCranesElement.textContent = stats.mantenimiento;
+                inactiveCranesElement.textContent = stats.inactivas;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar estadísticas: ' + error.message);
+            }
+        }
+
+        // Función para mostrar grúas en la tabla
+        function displayGruas(page = 1) {
             cranesList.innerHTML = '';
             
             const start = (page - 1) * recordsPerPage;
             const end = start + recordsPerPage;
-            const paginatedCranes = cranesArray.slice(start, end);
+            const paginatedGruas = gruas.slice(start, end);
             
-            if (paginatedCranes.length === 0) {
-                cranesList.innerHTML = '<tr><td colspan="8" style="text-align: center">No se encontraron grúas</td></tr>';
+            if (paginatedGruas.length === 0) {
+                cranesList.innerHTML = '<tr><td colspan="7" style="text-align: center">No se encontraron grúas</td></tr>';
+                setupPagination(gruas);
                 return;
             }
             
-            paginatedCranes.forEach(crane => {
+            paginatedGruas.forEach(grua => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${crane.id}</td>
-                    <td>${crane.model}</td>
-                    <td>${getTypeName(crane.type)}</td>
-                    <td>${crane.capacity}</td>
-                    <td>${crane.location}</td>
-                    <td><span class="status-badge ${crane.status}">${getStatusName(crane.status)}</span></td>
-                    <td>${formatDate(crane.nextMaintenance)}</td>
+                    <td>${grua.ID}</td>
+                    <td>${grua.Placa}</td>
+                    <td>${grua.Marca}</td>
+                    <td>${grua.Modelo}</td>
+                    <td>${grua.Tipo}</td>
+                    <td><span class="status-badge ${grua.Estado}">${grua.Estado}</span></td>
                     <td class="actions">
-                        <button class="view-btn" data-id="${crane.id}">Ver</button>
-                        <button class="edit-btn" data-id="${crane.id}">Editar</button>
-                        <button class="delete-btn" data-id="${crane.id}">Eliminar</button>
+                        <button class="view-btn" data-id="${grua.ID}">Ver</button>
+                        <button class="edit-btn" data-id="${grua.ID}">Editar</button>
+                        <button class="delete-btn" data-id="${grua.ID}">Eliminar</button>
                     </td>
                 `;
                 cranesList.appendChild(row);
             });
             
-            // Actualizar estadísticas
-            updateStats();
-            
-            // Configurar botones de acción
+            setupPagination(gruas);
             setupActionButtons();
-            
-            // Configurar paginación
-            setupPagination(cranesArray);
         }
 
-        // Función para obtener nombre del tipo
-        function getTypeName(type) {
-            const types = {
-                'torre': 'Grúa Torre',
-                'movil': 'Grúa Móvil',
-                'telescopica': 'Grúa Telescópica',
-                'portuaria': 'Grúa Portuaria'
-            };
-            return types[type] || type;
-        }
-
-        // Función para obtener nombre del estado
-        function getStatusName(status) {
-            const statuses = {
-                'available': 'Disponible',
-                'in-use': 'En operación',
-                'maintenance': 'En mantenimiento'
-            };
-            return statuses[status] || status;
-        }
-
-        // Función para formatear fecha
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
-        }
-
-        // Función para actualizar estadísticas
-        function updateStats() {
-            document.getElementById('totalCranes').textContent = cranes.length;
-            document.getElementById('availableCranes').textContent = cranes.filter(c => c.status === 'available').length;
-            document.getElementById('inUseCranes').textContent = cranes.filter(c => c.status === 'in-use').length;
-            document.getElementById('maintenanceCranes').textContent = cranes.filter(c => c.status === 'maintenance').length;
-        }
-
-        // Configurar botones de acción
-        function setupActionButtons() {
-            const viewButtons = document.querySelectorAll('.view-btn');
-            const editButtons = document.querySelectorAll('.edit-btn');
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            
-            viewButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = parseInt(button.getAttribute('data-id'));
-                    showCraneDetails(id);
-                });
-            });
-            
-            editButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = parseInt(button.getAttribute('data-id'));
-                    editCrane(id);
-                });
-            });
-            
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = parseInt(button.getAttribute('data-id'));
-                    if (confirm('¿Estás seguro de que deseas eliminar esta grúa?')) {
-                        deleteCrane(id);
-                    }
-                });
-            });
-        }
-
-        // Configurar paginación
-        function setupPagination(cranesArray) {
+        // Función para configurar la paginación
+        function setupPagination(gruas) {
             pagination.innerHTML = '';
-            const pageCount = Math.ceil(cranesArray.length / recordsPerPage);
+            const pageCount = Math.ceil(gruas.length / recordsPerPage);
             
-            // Botón anterior
-            const prevBtn = document.createElement('button');
-            prevBtn.innerText = 'Anterior';
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayCranes(currentPage, cranesArray);
-                }
-            });
-            pagination.appendChild(prevBtn);
+            if (pageCount <= 1) return;
             
-            // Botones de página
             for (let i = 1; i <= pageCount; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.innerText = i;
+                const button = document.createElement('button');
+                button.textContent = i;
                 if (i === currentPage) {
-                    pageBtn.classList.add('current-page');
+                    button.classList.add('active');
                 }
-                pageBtn.addEventListener('click', () => {
+                
+                button.addEventListener('click', () => {
                     currentPage = i;
-                    displayCranes(currentPage, cranesArray);
+                    displayGruas(currentPage);
                 });
-                pagination.appendChild(pageBtn);
+                
+                pagination.appendChild(button);
             }
-            
-            // Botón siguiente
-            const nextBtn = document.createElement('button');
-            nextBtn.innerText = 'Siguiente';
-            nextBtn.disabled = currentPage === pageCount;
-            nextBtn.addEventListener('click', () => {
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    displayCranes(currentPage, cranesArray);
-                }
-            });
-            pagination.appendChild(nextBtn);
         }
 
-        // Mostrar modal para añadir grúa
-        function showAddModal() {
-            modalTitle.innerText = 'Añadir Grúa';
-            document.getElementById('craneId').value = '';
-            craneForm.reset();
+        // Función para configurar los botones de acción
+        function setupActionButtons() {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewGrua(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => editGrua(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteGrua(btn.dataset.id));
+            });
+        }
+
+        // Función para ver los detalles de una grúa
+        async function viewGrua(id) {
+            try {
+                const response = await fetch(`api.php?action=getGrua&id=${id}`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener la grúa');
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.grua) {
+                    showGruaDetails(data.grua);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar la grúa: ' + error.message);
+            }
+        }
+
+        // Función para mostrar los detalles de una grúa
+        function showGruaDetails(grua) {
+            detailsTitle.textContent = `Grúa ${grua.Placa}`;
+            
+            // Llenar información básica
+            document.getElementById('detail-id').textContent = grua.ID;
+            document.getElementById('detail-placa').textContent = grua.Placa;
+            document.getElementById('detail-marca').textContent = grua.Marca;
+            document.getElementById('detail-modelo').textContent = grua.Modelo;
+            document.getElementById('detail-tipo').textContent = grua.Tipo;
+            document.getElementById('detail-estado').textContent = grua.Estado;
+            
+            // Configurar botón de editar
+            editFromDetailsBtn.dataset.id = grua.ID;
+            
+            // Mostrar modal
+            detailsModal.style.display = 'block';
+        }
+
+        // Función para editar una grúa
+        async function editGrua(id) {
+            try {
+                const response = await fetch(`api.php?action=getGrua&id=${id}`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener la grúa');
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.grua) {
+                    showEditForm(data.grua);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar la grúa: ' + error.message);
+            }
+        }
+
+        // Función para mostrar el formulario de edición
+        function showEditForm(grua) {
+            modalTitle.textContent = `Editar Grúa ${grua.Placa}`;
+            
+            // Llenar formulario
+            document.getElementById('craneId').value = grua.ID;
+            document.getElementById('placa').value = grua.Placa;
+            document.getElementById('marca').value = grua.Marca;
+            document.getElementById('modelo').value = grua.Modelo;
+            document.getElementById('tipo').value = grua.Tipo;
+            document.getElementById('estado').value = grua.Estado;
+            
+            // Mostrar modal
             craneModal.style.display = 'block';
         }
 
-        // Mostrar detalles de la grúa
-        function showCraneDetails(id) {
-            const crane = cranes.find(c => c.id === id);
+        // Función para eliminar una grúa
+        async function deleteGrua(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar esta grúa?')) {
+                return;
+            }
             
-            if (crane) {
-                detailsTitle.textContent = `Detalles: ${crane.model}`;
-                document.getElementById('detail-id').textContent = crane.id;
-                document.getElementById('detail-model').textContent = crane.model;
-                document.getElementById('detail-type').textContent = getTypeName(crane.type);
-                document.getElementById('detail-capacity').textContent = `${crane.capacity} ton`;
-                document.getElementById('detail-manufacturer').textContent = crane.manufacturer;
-                document.getElementById('detail-year').textContent = crane.year;
-                document.getElementById('detail-status').textContent = getStatusName(crane.status);
-                document.getElementById('detail-location').textContent = crane.location;
-                document.getElementById('detail-nextMaintenance').textContent = formatDate(crane.nextMaintenance);
-                document.getElementById('detail-notes').textContent = crane.notes || 'N/A';
+            try {
+                const response = await fetch(`api.php?action=deleteGrua&id=${id}`);
+                if (!response.ok) {
+                    throw new Error('Error al eliminar la grúa');
+                }
                 
-                // Configurar botones de acción
-                editFromDetailsBtn.setAttribute('data-id', crane.id);
-                scheduleMaintenanceBtn.setAttribute('data-id', crane.id);
-                addMaintenanceBtn.setAttribute('data-id', crane.id);
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 
-                // Mostrar solo la pestaña de información al principio
-                tabs.forEach(tab => tab.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                document.querySelector('.tabs li[data-tab="info"]').classList.add('active');
-                document.getElementById('info').classList.add('active');
-                
-                detailsModal.style.display = 'block';
+                if (data.success) {
+                    fetchGruas();
+                    alert('Grúa eliminada correctamente');
+                } else {
+                    throw new Error(data.message || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar la grúa: ' + error.message);
             }
         }
 
-        // Editar grúa
-        function editCrane(id) {
-            modalTitle.innerText = 'Editar Grúa';
-            const crane = cranes.find(c => c.id === id);
-            
-            if (crane) {
-                document.getElementById('craneId').value = crane.id;
-                document.getElementById('model').value = crane.model;
-                document.getElementById('type').value = crane.type;
-                document.getElementById('capacity').value = crane.capacity;
-                document.getElementById('manufacturer').value = crane.manufacturer;
-                document.getElementById('year').value = crane.year;
-                document.getElementById('status').value = crane.status;
-                document.getElementById('location').value = crane.location;
-                document.getElementById('nextMaintenance').value = crane.nextMaintenance;
-                document.getElementById('notes').value = crane.notes || '';
-                
-                craneModal.style.display = 'block';
-            }
-        }
-
-        // Eliminar grúa
-        function deleteCrane(id) {
-            cranes = cranes.filter(c => c.id !== id);
-            displayCranes(currentPage);
-        }
-
-        // Guardar grúa (añadir o actualizar)
-        function saveCrane(e) {
+        // Función para guardar una grúa (añadir o actualizar)
+        async function saveGrua(e) {
             e.preventDefault();
             
             const id = document.getElementById('craneId').value;
-            const model = document.getElementById('model').value;
-            const type = document.getElementById('type').value;
-            const capacity = parseFloat(document.getElementById('capacity').value);
-            const manufacturer = document.getElementById('manufacturer').value;
-            const year = parseInt(document.getElementById('year').value);
-            const status = document.getElementById('status').value;
-            const location = document.getElementById('location').value;
-            const nextMaintenance = document.getElementById('nextMaintenance').value;
-            const notes = document.getElementById('notes').value;
+            const placa = document.getElementById('placa').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const tipo = document.getElementById('tipo').value;
+            const estado = document.getElementById('estado').value;
             
-            if (id) {
-                // Actualizar grúa existente
-                const index = cranes.findIndex(c => c.id === parseInt(id));
-                if (index !== -1) {
-                    cranes[index] = {
-                        id: parseInt(id),
-                        model,
-                        type,
-                        capacity,
-                        manufacturer,
-                        year,
-                        status,
-                        location,
-                        nextMaintenance,
-                        notes
-                    };
-                }
-            } else {
-                // Añadir nueva grúa
-                const newId = cranes.length > 0 ? Math.max(...cranes.map(c => c.id)) + 1 : 1;
-                cranes.push({
-                    id: newId,
-                    model,
-                    type,
-                    capacity,
-                    manufacturer,
-                    year,
-                    status,
-                    location,
-                    nextMaintenance,
-                    notes
+            try {
+                const formData = new FormData();
+                if (id) formData.append('id', id);
+                formData.append('placa', placa);
+                formData.append('marca', marca);
+                formData.append('modelo', modelo);
+                formData.append('tipo', tipo);
+                formData.append('estado', estado);
+                
+                const response = await fetch('api.php?action=saveGrua', {
+                    method: 'POST',
+                    body: formData
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Error al guardar la grúa');
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.success) {
+                    craneModal.style.display = 'none';
+                    fetchGruas();
+                    alert('Grúa guardada correctamente');
+                } else {
+                    throw new Error(data.message || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar la grúa: ' + error.message);
             }
-            
-            craneModal.style.display = 'none';
-            displayCranes(currentPage);
         }
 
-        // Programar mantenimiento
-        function scheduleMaintenance(id) {
-            document.getElementById('maintenanceCraneId').value = id;
-            maintenanceModal.style.display = 'block';
-        }
-
-        // Guardar mantenimiento
-        function saveMaintenance(e) {
+        // Función para guardar un mantenimiento
+        async function saveMaintenance(e) {
             e.preventDefault();
             
-            const craneId = parseInt(document.getElementById('maintenanceCraneId').value);
-            const type = document.getElementById('maintenanceType').value;
-            const date = document.getElementById('maintenanceDate').value;
-            const technician = document.getElementById('technicianName').value;
-            const cost = parseFloat(document.getElementById('maintenanceCost').value) || 0;
-            const details = document.getElementById('maintenanceDetails').value;
-            const nextMaintenance = document.getElementById('nextMaintenanceUpdate').value;
+            const craneId = document.getElementById('maintenanceCraneId').value;
+            const tipo = document.getElementById('maintenanceType').value;
+            const fecha = document.getElementById('maintenanceDate').value;
+            const tecnico = document.getElementById('technicianName').value;
+            const costo = document.getElementById('maintenanceCost').value;
+            const detalles = document.getElementById('maintenanceDetails').value;
             
-            // En una aplicación real, aquí guardarías el mantenimiento en la base de datos
-            // Por ahora solo actualizamos la fecha del próximo mantenimiento en la grúa
-            
-            const craneIndex = cranes.findIndex(c => c.id === craneId);
-            if (craneIndex !== -1) {
-                cranes[craneIndex].nextMaintenance = nextMaintenance;
+            try {
+                const formData = new FormData();
+                formData.append('gruaId', craneId);
+                formData.append('tipo', tipo);
+                formData.append('fecha', fecha);
+                formData.append('tecnico', tecnico);
+                formData.append('costo', costo);
+                formData.append('detalles', detalles);
                 
-                // Si es mantenimiento correctivo, cambiar estado a mantenimiento
-                if (type === 'correctivo') {
-                    cranes[craneIndex].status = 'maintenance';
+                const response = await fetch('api.php?action=saveMantenimiento', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error al guardar el mantenimiento');
                 }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                if (data.success) {
+                    maintenanceModal.style.display = 'none';
+                    alert('Mantenimiento registrado correctamente');
+                    // Recargar historial de mantenimiento
+                    loadMaintenanceHistory(craneId);
+                } else {
+                    throw new Error(data.message || 'Error desconocido');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al guardar el mantenimiento: ' + error.message);
             }
-            
-            maintenanceModal.style.display = 'none';
-            displayCranes(currentPage);
-            
-            // Mostrar mensaje de éxito
-            alert('Mantenimiento registrado correctamente');
         }
 
-        // Buscar grúas
-        function searchCranes() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const status = statusFilter.value;
-            const type = typeFilter.value;
-            
-            let filteredCranes = cranes;
-            
-            if (searchTerm.trim() !== '') {
-                filteredCranes = filteredCranes.filter(c => 
-                    c.id.toString().includes(searchTerm) ||
-                    c.model.toLowerCase().includes(searchTerm)
-                );
+        // Función para cargar el historial de mantenimiento
+        async function loadMaintenanceHistory(gruaId) {
+            try {
+                const response = await fetch(`api.php?action=getMantenimientos&gruaId=${gruaId}`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener el historial de mantenimiento');
+                }
+                
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                displayMaintenanceHistory(data.mantenimientos || []);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar el historial de mantenimiento: ' + error.message);
             }
-            
-            if (status !== 'all') {
-                filteredCranes = filteredCranes.filter(c => c.status === status);
-            }
-            
-            if (type !== 'all') {
-                filteredCranes = filteredCranes.filter(c => c.type === type);
-            }
-            
-            currentPage = 1;
-            displayCranes(currentPage, filteredCranes);
         }
 
-        // Configurar pestañas
+        // Función para mostrar el historial de mantenimiento
+        function displayMaintenanceHistory(mantenimientos) {
+            const maintenanceLog = document.getElementById('maintenanceLog');
+            maintenanceLog.innerHTML = '';
+            
+            if (mantenimientos.length === 0) {
+                maintenanceLog.innerHTML = '<p>No hay registros de mantenimiento</p>';
+                return;
+            }
+            
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Técnico</th>
+                        <th>Costo</th>
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${mantenimientos.map(m => `
+                        <tr>
+                            <td>${m.Tipo}</td>
+                            <td>${m.Fecha}</td>
+                            <td>${m.Tecnico}</td>
+                            <td>${m.Costo ? '$' + m.Costo : 'N/A'}</td>
+                            <td>${m.Detalles}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            
+            maintenanceLog.appendChild(table);
+        }
+
+        // Función para configurar las pestañas
         function setupTabs() {
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
+                    // Remover clase active de todas las pestañas y contenidos
                     tabs.forEach(t => t.classList.remove('active'));
                     tabContents.forEach(c => c.classList.remove('active'));
                     
+                    // Agregar clase active a la pestaña clickeada
                     tab.classList.add('active');
+                    
+                    // Mostrar el contenido correspondiente
                     const tabId = tab.getAttribute('data-tab');
                     document.getElementById(tabId).classList.add('active');
+                    
+                    // Si es la pestaña de mantenimiento, cargar el historial
+                    if (tabId === 'maintenance') {
+                        const gruaId = editFromDetailsBtn.dataset.id;
+                        if (gruaId) {
+                            loadMaintenanceHistory(gruaId);
+                        }
+                    }
                 });
             });
         }
 
         // Event Listeners
         window.addEventListener('load', () => {
-            displayCranes();
+            fetchGruas();
             setupTabs();
         });
 
-        addCraneBtn.addEventListener('click', showAddModal);
-
-        closeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
-            });
+        // Botón para añadir nueva grúa
+        addCraneBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Añadir Nueva Grúa';
+            craneForm.reset();
+            document.getElementById('craneId').value = '';
+            craneModal.style.display = 'block';
         });
 
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.style.display = 'none';
-            }
+        // Botón de búsqueda
+        searchBtn.addEventListener('click', () => {
+            currentPage = 1;
+            fetchGruas();
         });
 
-        craneForm.addEventListener('submit', saveCrane);
-        maintenanceForm.addEventListener('submit', saveMaintenance);
-
-        searchBtn.addEventListener('click', searchCranes);
-        statusFilter.addEventListener('change', searchCranes);
-        typeFilter.addEventListener('change', searchCranes);
-
-        searchInput.addEventListener('keyup', (e) => {
+        // Buscar al presionar Enter
+        searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                searchCranes();
+                currentPage = 1;
+                fetchGruas();
             }
         });
 
-        editFromDetailsBtn.addEventListener('click', function() {
-            const id = parseInt(this.getAttribute('data-id'));
-            detailsModal.style.display = 'none';
-            editCrane(id);
+        // Filtrar al cambiar los selectores
+        statusFilter.addEventListener('change', () => {
+            currentPage = 1;
+            fetchGruas();
         });
 
-        scheduleMaintenanceBtn.addEventListener('click', function() {
-            const id = parseInt(this.getAttribute('data-id'));
-            detailsModal.style.display = 'none';
-            scheduleMaintenance(id);
+        typeFilter.addEventListener('change', () => {
+            currentPage = 1;
+            fetchGruas();
         });
 
-        addMaintenanceBtn.addEventListener('click', function() {
-            const id = parseInt(this.getAttribute('data-id'));
-            detailsModal.style.display = 'none';
-            scheduleMaintenance(id);
-        });
-
-        // Mejorar la experiencia en móviles para la barra lateral
-        if ('ontouchstart' in window) {
-            let isExpanded = false;
-            
-            sidebar.addEventListener('click', function(e) {
-                if (e.target.closest('.sidebar_element') || e.target.closest('.sidebar_footer')) {
-                    return; // No hacer nada si se hace clic en un elemento interactivo
-                }
-                
-                isExpanded = !isExpanded;
-                this.style.width = isExpanded ? '250px' : '70px';
-                document.querySelector('.main-content').style.marginLeft = 
-                    isExpanded ? '250px' : '70px';
+        // Cerrar modales
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                craneModal.style.display = 'none';
+                detailsModal.style.display = 'none';
+                maintenanceModal.style.display = 'none';
             });
-        }
+        });
+
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === craneModal) {
+                craneModal.style.display = 'none';
+            }
+            if (e.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+            if (e.target === maintenanceModal) {
+                maintenanceModal.style.display = 'none';
+            }
+        });
+
+        // Formulario de grúa
+        craneForm.addEventListener('submit', saveGrua);
+
+        // Botón de editar desde detalles
+        editFromDetailsBtn.addEventListener('click', () => {
+            const id = editFromDetailsBtn.dataset.id;
+            if (id) {
+                detailsModal.style.display = 'none';
+                editGrua(id);
+            }
+        });
+
+        // Botón para añadir mantenimiento
+        addMaintenanceBtn.addEventListener('click', () => {
+            const gruaId = editFromDetailsBtn.dataset.id;
+            if (gruaId) {
+                document.getElementById('maintenanceCraneId').value = gruaId;
+                document.getElementById('maintenanceDate').valueAsDate = new Date();
+                maintenanceForm.reset();
+                maintenanceModal.style.display = 'block';
+            }
+        });
+
+        // Formulario de mantenimiento
+        maintenanceForm.addEventListener('submit', saveMaintenance);
     </script>
 </body>
 </html>

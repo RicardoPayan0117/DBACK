@@ -3,7 +3,7 @@
 $host = "localhost";
 $usuario = "root";
 $clave = "5211";
-$bd = "dback";
+$bd = "gruas_dback";
 
 $conexion = new mysqli($host, $usuario, $clave, $bd);
 
@@ -11,12 +11,16 @@ if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 
-// Consulta de solicitudes
-$sql = "SELECT nombre_completo, telefono, correo, distancia, costo, fecha_hora, tipo_servicio, urgencia, estado 
+// Consulta de solicitudes (solo con columnas existentes)
+$sql = "SELECT nombre_completo, telefono, distancia, costo, fecha_hora, tipo_servicio, urgencia, estado 
         FROM solicitudes
         ORDER BY fecha_hora DESC";
 
 $resultado = $conexion->query($sql);
+
+if (!$resultado) {
+    die("Error en la consulta: " . $conexion->error);
+}
 ?>
 
 <!DOCTYPE html>
@@ -27,40 +31,6 @@ $resultado = $conexion->query($sql);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .main-content {
-      padding: 20px;
-      margin-left: 260px; /* espacio para el sidebar */
-    }
-    .request-card {
-      border-left: 5px solid #0d6efd;
-    }
-    .request-icon {
-      margin-right: 5px;
-    }
-    .card-title {
-      margin-bottom: 10px;
-    }
-    .sidebar {
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      background-color: #fff;
-      border-right: 1px solid #dee2e6;
-      padding: 20px;
-    }
-    .sidebar_icon {
-      margin-right: 10px;
-    }
-    .sidebar_text {
-      font-weight: 500;
-    }
-  </style>
 </head>
 <body>
   <!-- Barra lateral -->
@@ -127,7 +97,6 @@ $resultado = $conexion->query($sql);
                         <small class="text-muted">(<?= htmlspecialchars($fila['telefono']) ?>)</small>
                       </h3>
                       <ul class="list-unstyled mb-0">
-                        <li><i class="bi bi-envelope request-icon"></i> <?= htmlspecialchars($fila['correo']) ?></li>
                         <li><i class="bi bi-calendar3 request-icon"></i> <strong>Fecha:</strong> <?= $fila['fecha_hora'] ?></li>
                         <li><i class="bi bi-pin-map request-icon"></i> <strong>Distancia:</strong> <?= $fila['distancia'] ?> km</li>
                         <li><i class="bi bi-currency-dollar request-icon"></i> <strong>Costo:</strong> $<?= number_format($fila['costo'], 2) ?> MXN</li>
@@ -170,3 +139,8 @@ $resultado = $conexion->query($sql);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php
+// Cerrar conexión
+$conexion->close();
+?>

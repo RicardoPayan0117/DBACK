@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistema de administración para Grúas DBACK">
     <title>Grúas DBACK - Administración</title>
-    <link rel="stylesheet" href=".\CSS\MenuAdmin.CSS">
+    <link rel="stylesheet" href="./CSS/MenuAdmin.CSS">
+    <!-- Añadir Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-     <!-- Barra lateral mejorada con ARIA -->
+    <!-- Barra lateral mejorada con ARIA -->
     <nav class="sidebar" aria-label="Menú principal">
         <div class="sidebar_header">
             <img src="Elementos/LogoDBACK.png" class="sidebar_icon sidebar_icon--logo" alt="Logo DBACK" width="30" height="30">
@@ -193,7 +195,9 @@
             // Encuentra el elemento correspondiente en el sidebar
             const navItems = document.querySelectorAll('.sidebar_element');
             navItems.forEach(item => {
-                if (item.textContent.includes(sections[sectionId]?.title ||  item.querySelector('.sidebar_text')?.textContent.includes(sections[sectionId]?.title)) {  item.classList.add('active');
+                const textElement = item.querySelector('.sidebar_text');
+                if (textElement && textElement.textContent.includes(sections[sectionId].title)) {
+                    item.classList.add('active');
                     item.setAttribute('aria-current', 'page');
                 }
             });
