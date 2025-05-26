@@ -11,22 +11,23 @@ if (!isset($_SESSION['usuario_id'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validar y limpiar datos
     $cliente_id = intval($_POST['cliente_id']);
+    $vehiculo_id = isset($_POST['vehiculo_id']) ? intval($_POST['vehiculo_id']) : null;
     $fecha_servicio = $conn->real_escape_string($_POST['fecha_servicio']);
     $ubicacion_origen = $conn->real_escape_string($_POST['ubicacion_origen']);
-    $ubicacion_destino= $conn->real_escape_string($_POST['ubicacion_destino']);
+    $ubicacion_destino = $conn->real_escape_string($_POST['ubicacion_destino']);
     $distancia_km = floatval($_POST['distancia_km']);
     $tipo_servicio = $conn->real_escape_string($_POST['tipo_servicio']);
     $urgencia = $conn->real_escape_string($_POST['urgencia']);
     $descripcion = $conn->real_escape_string($_POST['descripcion']);
     
     // Calcular costo basado en distancia y tipo de servicio
-    $costo = calcularCosto($distancia_km, $tipo_servicio, $urgencia);
+    $costo_estimado = calcularCosto($distancia_km, $tipo_servicio, $urgencia);
     
-    // Insertar solicitud
-    $query = "INSERT INTO solicitudes (cliente_id, fecha_servicio, ubicacion_origen, ubicacion_destino, distancia_km, tipo_servicio, urgencia, estado, costo, descripcion) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?)";
+    // Insertar solicitud (CORREGIDO: cambiado cliente_id por id_cliente)
+    $query = "INSERT INTO servicios (id_cliente, vehiculo_id, ubicacion_origen, ubicacion_destino, tipo_servicio, descripcion, urgencia, distancia_km, costo_estimado, estado, fecha_servicio) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("isssdssds", $cliente_id, $fecha_servicio, $ubicacion_origen, $ubicacion_destino, $distancia_km, $tipo_servicio, $urgencia, $costo, $descripcion);
+    $stmt->bind_param("iisssssds", $id_cliente, $vehiculo_id, $ubicacion_origen, $ubicacion_destino, $tipo_servicio, $descripcion, $urgencia, $distancia_km, $costo_estimado, $fecha_servicio);
     
     if ($stmt->execute()) {
         $_SESSION['mensaje'] = "Solicitud creada correctamente";
@@ -38,14 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Función para calcular costo (simplificada)
+// Función para calcular costo (CORREGIDA para usar los valores correctos del ENUM)
 function calcularCosto($distancia_km, $tipo_servicio, $urgencia) {
     $costo_base = 500; // Costo base en pesos
     
     // Ajustar por distancia
     $costo = $costo_base + ($distancia_km * 50);
     
-    // Ajustar por tipo de servicio
+    // Ajustar por tipo de servicio (CORREGIDO para usar los valores del ENUM)
     switch ($tipo_servicio) {
         case 'remolque':
             $costo *= 1.5;
@@ -53,8 +54,17 @@ function calcularCosto($distancia_km, $tipo_servicio, $urgencia) {
         case 'arranque':
             $costo *= 1.2;
             break;
-        case 'cambio_llanta':
+        case 'llanta':
             $costo += 200;
+            break;
+        case 'bateria':
+            $costo *= 1.1;
+            break;
+        case 'gasolina':
+            $costo += 150;
+            break;
+        case 'otro':
+            $costo *= 1.0;
             break;
     }
     
@@ -74,6 +84,10 @@ function calcularCosto($distancia_km, $tipo_servicio, $urgencia) {
 // Obtener lista de clientes
 $query = "SELECT id, nombre, telefono FROM clientes ORDER BY nombre";
 $clientes_result = $conn->query($query);
+
+// Obtener lista de vehículos (CORREGIDO - sin campo placa)
+$query_vehiculos = "SELECT id, marca, modelo FROM vehiculos ORDER BY marca, modelo";
+$vehiculos_result = $conn->query($query_vehiculos);
 ?>
 
 <!DOCTYPE html>
@@ -117,7 +131,7 @@ $clientes_result = $conn->query($query);
       </li>
       
       <li class="sidebar_element" role="menuitem">
-        <a href="Empleados.php" class="sidebar_link">
+        <a href="Empleados.html" class="sidebar_link">
           <i class="bi bi-people sidebar_icon"></i>
           <span class="sidebar_text">Empleados</span>
         </a>
@@ -180,6 +194,21 @@ $clientes_result = $conn->query($query);
                 </select>
               </div>
               
+              <!-- Selección de vehículo (AGREGADO) -->
+              <div class="col-md-6">
+                <label for="vehiculo_id" class="form-label">Vehículo (Opcional)</label>
+                <select class="form-select" id="vehiculo_id" name="vehiculo_id">
+                  <option value="">Seleccionar vehículo...</option>
+                  <?php if ($vehiculos_result && $vehiculos_result->num_rows > 0): ?>
+                    <?php while ($vehiculo = $vehiculos_result->fetch_assoc()): ?>
+                      <option value="<?php echo $vehiculo['id']; ?>">
+                        <?php echo htmlspecialchars($vehiculo['marca'] . ' ' . $vehiculo['modelo']); ?>
+                      </option>
+                    <?php endwhile; ?>
+                  <?php endif; ?>
+                </select>
+              </div>
+              
               <!-- Fecha y hora del servicio -->
               <div class="col-md-6">
                 <label for="fecha_servicio" class="form-label">Fecha y hora del servicio</label>
@@ -206,22 +235,23 @@ $clientes_result = $conn->query($query);
               
               <!-- Distancia -->
               <div class="col-md-4">
-                <label for="distancia" class="form-label">Distancia (km)</label>
-                <input type="number" class="form-control" id="distancia" name="distancia" step="0.01" min="0" required>
+                <label for="distancia_km" class="form-label">Distancia (km)</label>
+                <input type="number" class="form-control" id="distancia_km" name="distancia_km" step="0.01" min="0" required>
                 <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="calcularDistancia()">
                   <i class="bi bi-calculator"></i> Calcular distancia
                 </button>
               </div>
               
-              <!-- Tipo de servicio -->
+              <!-- Tipo de servicio (CORREGIDO para usar los valores del ENUM) -->
               <div class="col-md-4">
                 <label for="tipo_servicio" class="form-label">Tipo de servicio</label>
                 <select class="form-select" id="tipo_servicio" name="tipo_servicio" required>
                   <option value="">Seleccionar...</option>
                   <option value="remolque">Remolque</option>
+                  <option value="bateria">Servicio de batería</option>
+                  <option value="gasolina">Suministro de gasolina</option>
+                  <option value="llanta">Cambio de llanta</option>
                   <option value="arranque">Servicio de arranque</option>
-                  <option value="cambio_llanta">Cambio de llanta</option>
-                  <option value="suministro_gasolina">Suministro de gasolina</option>
                   <option value="otro">Otro servicio</option>
                 </select>
               </div>
@@ -292,16 +322,21 @@ $clientes_result = $conn->query($query);
       
       navigator.geolocation.getCurrentPosition(
         function(position) {
-          // En una implementación real, usarías una API de geocodificación inversa
-          // para obtener una dirección a partir de las coordenadas
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
+          
+          // Guardar coordenadas en atributos data para usar después
+          input.setAttribute('data-lat', lat);
+          input.setAttribute('data-lng', lng);
           input.value = `Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           input.disabled = false;
           
-          // Si ambos campos de ubicación están llenos, calcular distancia
-          if (document.getElementById('ubicacion_origen').value && document.getElementById('ubicacion_destino').value) {
-            calcularDistancia();
+          // Si ambos campos tienen coordenadas, calcular distancia automáticamente
+          const origen = document.getElementById('ubicacion_origen');
+          const destino = document.getElementById('ubicacion_destino');
+          
+          if (origen.getAttribute('data-lat') && destino.getAttribute('data-lat')) {
+            calcularDistanciaReal();
           }
         },
         function(error) {
@@ -313,7 +348,41 @@ $clientes_result = $conn->query($query);
       );
     }
     
-    // Función para calcular distancia (simulada)
+    // Función para calcular distancia real usando coordenadas
+    function calcularDistanciaReal() {
+      const origen = document.getElementById('ubicacion_origen');
+      const destino = document.getElementById('ubicacion_destino');
+      
+      const lat1 = parseFloat(origen.getAttribute('data-lat'));
+      const lng1 = parseFloat(origen.getAttribute('data-lng'));
+      const lat2 = parseFloat(destino.getAttribute('data-lat'));
+      const lng2 = parseFloat(destino.getAttribute('data-lng'));
+      
+      if (lat1 && lng1 && lat2 && lng2) {
+        const distancia = calcularDistanciaHaversine(lat1, lng1, lat2, lng2);
+        document.getElementById('distancia_km').value = distancia.toFixed(2);
+        document.getElementById('resumen-distancia_km').textContent = distancia.toFixed(2);
+        actualizarResumenCosto();
+      }
+    }
+    
+    // Función Haversine para calcular distancia entre dos puntos geográficos
+    function calcularDistanciaHaversine(lat1, lng1, lat2, lng2) {
+      const R = 6371; // Radio de la Tierra en kilómetros
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLng = (lng2 - lng1) * Math.PI / 180;
+      
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distancia = R * c;
+      
+      return distancia;
+    }
+    
+    // Función para calcular distancia (botón manual)
     function calcularDistancia() {
       const ubicacion_origen = document.getElementById('ubicacion_origen').value;
       const ubicacion_destino = document.getElementById('ubicacion_destino').value;
@@ -323,55 +392,87 @@ $clientes_result = $conn->query($query);
         return;
       }
       
-      // Simular cálculo de distancia (en una implementación real usarías la API de Google Maps)
-      const distancia_km = (Math.random() * 50 + 5).toFixed(2); // Entre 5 y 55 km
-      document.getElementById('distancia').value = distancia;
-      document.getElementById('resumen-distancia').textContent = distancia;
+      // Si hay coordenadas guardadas, usar cálculo real
+      const origen = document.getElementById('ubicacion_origen');
+      const destino = document.getElementById('ubicacion_destino');
       
-      // Actualizar resumen de costo
-      actualizarResumenCosto();
+      if (origen.getAttribute('data-lat') && destino.getAttribute('data-lat')) {
+        calcularDistanciaReal();
+      } else {
+        // Simular cálculo de distancia si no hay coordenadas
+        const distancia_km = (Math.random() * 50 + 5).toFixed(2);
+        document.getElementById('distancia_km').value = distancia_km;
+        document.getElementById('resumen-distancia_km').textContent = distancia_km;
+        actualizarResumenCosto();
+      }
     }
     
-    // Función para actualizar el resumen de costo
+    // Función para actualizar el resumen de costo (CORREGIDA para usar los valores correctos del ENUM)
     function actualizarResumenCosto() {
       const distancia_km = parseFloat(document.getElementById('distancia_km').value) || 0;
       const tipoServicio = document.getElementById('tipo_servicio').value;
       const urgencia = document.getElementById('urgencia').value;
       
-      // Actualizar resumen
-      document.getElementById('resumen-tipo').textContent = tipoServicio ? 
-        document.getElementById('tipo_servicio').options[document.getElementById('tipo_servicio').selectedIndex].text : 
-        'No seleccionado';
-      document.getElementById('resumen-urgencia').textContent = 
-        document.getElementById('urgencia').options[document.getElementById('urgencia').selectedIndex].text;
+      // Actualizar resumen de distancia
+      document.getElementById('resumen-distancia_km').textContent = distancia_km.toFixed(2);
       
-      // Calcular costo estimado (simplificado)
+      // Actualizar resumen de tipo de servicio
+      const tipoSelect = document.getElementById('tipo_servicio');
+      document.getElementById('resumen-tipo').textContent = tipoServicio ? 
+        tipoSelect.options[tipoSelect.selectedIndex].text : 
+        'No seleccionado';
+        
+      // Actualizar resumen de urgencia
+      const urgenciaSelect = document.getElementById('urgencia');
+      document.getElementById('resumen-urgencia').textContent = 
+        urgenciaSelect.options[urgenciaSelect.selectedIndex].text;
+      
+      // Calcular costo estimado (CORREGIDO para usar los valores correctos del ENUM)
       let costo = 500; // Base
-      costo += distancia_km* 50; // Por km
+      costo += distancia_km * 50; // Por km
       
       // Ajustar por tipo de servicio
       switch(tipoServicio) {
-        case 'remolque': costo *= 1.5; break;
-        case 'arranque': costo *= 1.2; break;
-        case 'cambio_llanta': costo += 200; break;
+        case 'remolque': 
+          costo *= 1.5; 
+          break;
+        case 'arranque': 
+          costo *= 1.2; 
+          break;
+        case 'llanta': 
+          costo += 200; 
+          break;
+        case 'bateria':
+          costo *= 1.1;
+          break;
+        case 'gasolina':
+          costo += 150;
+          break;
+        case 'otro':
+          costo *= 1.0;
+          break;
       }
       
       // Ajustar por urgencia
       switch(urgencia) {
-        case 'urgente': costo *= 1.3; break;
-        case 'emergencia': costo *= 1.5; break;
+        case 'urgente': 
+          costo *= 1.3; 
+          break;
+        case 'emergencia': 
+          costo *= 1.5; 
+          break;
       }
       
       document.getElementById('resumen-costo').textContent = costo.toFixed(2);
     }
     
     // Event listeners para actualizar el resumen
-    document.getElementById('distancia_km').addEventListener('change', actualizarResumenCosto);
-    document.getElementById('tipo_servicio').addEventListener('change', actualizarResumenCosto);
-    document.getElementById('urgencia').addEventListener('change', actualizarResumenCosto);
-    
-    // Mejora para dispositivos móviles
     document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('distancia_km').addEventListener('input', actualizarResumenCosto);
+      document.getElementById('tipo_servicio').addEventListener('change', actualizarResumenCosto);
+      document.getElementById('urgencia').addEventListener('change', actualizarResumenCosto);
+      
+      // Sidebar para dispositivos móviles
       const sidebar = document.getElementById('sidebar');
       
       if ('ontouchstart' in window) {
