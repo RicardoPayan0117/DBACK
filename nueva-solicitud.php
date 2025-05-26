@@ -12,21 +12,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validar y limpiar datos
     $cliente_id = intval($_POST['cliente_id']);
     $fecha_servicio = $conn->real_escape_string($_POST['fecha_servicio']);
-    $origen = $conn->real_escape_string($_POST['origen']);
-    $destino = $conn->real_escape_string($_POST['destino']);
-    $distancia = floatval($_POST['distancia']);
+    $ubicacion_origen = $conn->real_escape_string($_POST['ubicacion_origen']);
+    $ubicacion_destino= $conn->real_escape_string($_POST['ubicacion_destino']);
+    $distancia_km = floatval($_POST['distancia_km']);
     $tipo_servicio = $conn->real_escape_string($_POST['tipo_servicio']);
     $urgencia = $conn->real_escape_string($_POST['urgencia']);
     $descripcion = $conn->real_escape_string($_POST['descripcion']);
     
     // Calcular costo basado en distancia y tipo de servicio
-    $costo = calcularCosto($distancia, $tipo_servicio, $urgencia);
+    $costo = calcularCosto($distancia_km, $tipo_servicio, $urgencia);
     
     // Insertar solicitud
-    $query = "INSERT INTO solicitudes (cliente_id, fecha_servicio, origen, destino, distancia, tipo_servicio, urgencia, estado, costo, descripcion) 
+    $query = "INSERT INTO solicitudes (cliente_id, fecha_servicio, ubicacion_origen, ubicacion_destino, distancia_km, tipo_servicio, urgencia, estado, costo, descripcion) 
               VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("isssdssds", $cliente_id, $fecha_servicio, $origen, $destino, $distancia, $tipo_servicio, $urgencia, $costo, $descripcion);
+    $stmt->bind_param("isssdssds", $cliente_id, $fecha_servicio, $ubicacion_origen, $ubicacion_destino, $distancia_km, $tipo_servicio, $urgencia, $costo, $descripcion);
     
     if ($stmt->execute()) {
         $_SESSION['mensaje'] = "Solicitud creada correctamente";
@@ -39,11 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Función para calcular costo (simplificada)
-function calcularCosto($distancia, $tipo_servicio, $urgencia) {
+function calcularCosto($distancia_km, $tipo_servicio, $urgencia) {
     $costo_base = 500; // Costo base en pesos
     
     // Ajustar por distancia
-    $costo = $costo_base + ($distancia * 50);
+    $costo = $costo_base + ($distancia_km * 50);
     
     // Ajustar por tipo de servicio
     switch ($tipo_servicio) {
@@ -188,18 +188,18 @@ $clientes_result = $conn->query($query);
               
               <!-- Ubicación de origen -->
               <div class="col-md-6">
-                <label for="origen" class="form-label">Ubicación de origen</label>
-                <input type="text" class="form-control" id="origen" name="origen" required>
-                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="obtenerUbicacion('origen')">
+                <label for="ubicacion_origen" class="form-label">Ubicación de origen</label>
+                <input type="text" class="form-control" id="ubicacion_origen" name="ubicacion_origen" required>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="obtenerUbicacion('ubicacion_origen')">
                   <i class="bi bi-geo-alt"></i> Obtener ubicación actual
                 </button>
               </div>
               
               <!-- Ubicación de destino -->
               <div class="col-md-6">
-                <label for="destino" class="form-label">Ubicación de destino</label>
-                <input type="text" class="form-control" id="destino" name="destino" required>
-                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="obtenerUbicacion('destino')">
+                <label for="ubicacion_destino" class="form-label">Ubicación de destino</label>
+                <input type="text" class="form-control" id="ubicacion_destino" name="ubicacion_destino" required>
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="obtenerUbicacion('ubicacion_destino')">
                   <i class="bi bi-geo-alt"></i> Obtener ubicación actual
                 </button>
               </div>
@@ -251,7 +251,7 @@ $clientes_result = $conn->query($query);
                   <div class="card-body">
                     <div class="row">
                       <div class="col-md-6">
-                        <p><strong>Distancia:</strong> <span id="resumen-distancia">0</span> km</p>
+                        <p><strong>Distancia:</strong> <span id="resumen-distancia_km">0</span> km</p>
                         <p><strong>Tipo de servicio:</strong> <span id="resumen-tipo">No seleccionado</span></p>
                         <p><strong>Urgencia:</strong> <span id="resumen-urgencia">Normal</span></p>
                       </div>
@@ -300,7 +300,7 @@ $clientes_result = $conn->query($query);
           input.disabled = false;
           
           // Si ambos campos de ubicación están llenos, calcular distancia
-          if (document.getElementById('origen').value && document.getElementById('destino').value) {
+          if (document.getElementById('ubicacion_origen').value && document.getElementById('ubicacion_destino').value) {
             calcularDistancia();
           }
         },
@@ -315,16 +315,16 @@ $clientes_result = $conn->query($query);
     
     // Función para calcular distancia (simulada)
     function calcularDistancia() {
-      const origen = document.getElementById('origen').value;
-      const destino = document.getElementById('destino').value;
+      const ubicacion_origen = document.getElementById('ubicacion_origen').value;
+      const ubicacion_destino = document.getElementById('ubicacion_destino').value;
       
-      if (!origen || !destino) {
+      if (!ubicacion_origen || !ubicacion_destino) {
         alert("Por favor complete ambas ubicaciones");
         return;
       }
       
       // Simular cálculo de distancia (en una implementación real usarías la API de Google Maps)
-      const distancia = (Math.random() * 50 + 5).toFixed(2); // Entre 5 y 55 km
+      const distancia_km = (Math.random() * 50 + 5).toFixed(2); // Entre 5 y 55 km
       document.getElementById('distancia').value = distancia;
       document.getElementById('resumen-distancia').textContent = distancia;
       
@@ -334,7 +334,7 @@ $clientes_result = $conn->query($query);
     
     // Función para actualizar el resumen de costo
     function actualizarResumenCosto() {
-      const distancia = parseFloat(document.getElementById('distancia').value) || 0;
+      const distancia_km = parseFloat(document.getElementById('distancia_km').value) || 0;
       const tipoServicio = document.getElementById('tipo_servicio').value;
       const urgencia = document.getElementById('urgencia').value;
       
@@ -347,7 +347,7 @@ $clientes_result = $conn->query($query);
       
       // Calcular costo estimado (simplificado)
       let costo = 500; // Base
-      costo += distancia * 50; // Por km
+      costo += distancia_km* 50; // Por km
       
       // Ajustar por tipo de servicio
       switch(tipoServicio) {
@@ -366,7 +366,7 @@ $clientes_result = $conn->query($query);
     }
     
     // Event listeners para actualizar el resumen
-    document.getElementById('distancia').addEventListener('change', actualizarResumenCosto);
+    document.getElementById('distancia_km').addEventListener('change', actualizarResumenCosto);
     document.getElementById('tipo_servicio').addEventListener('change', actualizarResumenCosto);
     document.getElementById('urgencia').addEventListener('change', actualizarResumenCosto);
     
