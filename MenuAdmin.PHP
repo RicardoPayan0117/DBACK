@@ -54,9 +54,13 @@
             </li>
         </ul>
 <?php
-    session_start();
-    $nombre = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Usuario';
-    $cargo  = isset($_SESSION['usuario_cargo']) ? $_SESSION['usuario_cargo'] : '';
+session_start();
+
+// Después de validar el usuario en la base de datos:
+$_SESSION['usuario_nombre'] = $usuario['nombre'];   // o el campo correcto de la BD
+$_SESSION['usuario_cargo'] = $usuario['cargo'];     // idem
+
+
 ?>
 <div class="sidebar_footer">
     <div class="sidebar_element" role="contentinfo">

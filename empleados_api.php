@@ -101,7 +101,7 @@ function handleGetEmployee($pdo, $id) {
 }
 
 function handleAddEmployee($pdo, $data) {
-    $required = ['nombre', 'apellido_paterno', 'apellido_materno', 'cargo', 'sueldo_diario', 'telefono', 'email'];
+    $required = ['nombre', 'apellido_paterno', 'apellido_materno', 'usuario', 'contraseña', 'cargo', 'sueldo_diario', 'telefono', 'email'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
             echo json_encode(['success' => false, 'message' => "Falta el campo $field"]);
@@ -118,13 +118,16 @@ function handleAddEmployee($pdo, $data) {
             return;
         }
 
+        // Hashear la contraseña
+        $hashedPassword = password_hash($data['contraseña'], PASSWORD_DEFAULT);
+
         $stmt = $pdo->prepare("INSERT INTO personal (nombre, apellido_paterno, apellido_materno, usuario, contraseña, cargo, sueldo_diario, telefono, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['nombre'],
             $data['apellido_paterno'],
             $data['apellido_materno'],
             $data['usuario'],
-            $data['contraseña'],
+            $hashedPassword, // Aquí va el hash
             $data['cargo'],
             $data['sueldo_diario'],
             $data['telefono'],
@@ -160,13 +163,16 @@ function handleUpdateEmployee($pdo, $data) {
             return;
         }
 
-        $stmt = $pdo->prepare("UPDATE personal SET nombre=?, apellido_paterno=?, apellido_materno=?, usuario =?, contraseña =?, cargo=?, sueldo_diario=?, telefono=?, email=? WHERE id=?");
+        // Hashear la contraseña
+        $hashedPassword = password_hash($data['contraseña'], PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare("UPDATE personal SET nombre=?, apellido_paterno=?, apellido_materno=?, usuario=?, contraseña=?, cargo=?, sueldo_diario=?, telefono=?, email=? WHERE id=?");
         $stmt->execute([
             $data['nombre'],
             $data['apellido_paterno'],
             $data['apellido_materno'],
             $data['usuario'],
-            $data['contraseña'],
+            $hashedPassword, // Aquí va el hash
             $data['cargo'],
             $data['sueldo_diario'],
             $data['telefono'],

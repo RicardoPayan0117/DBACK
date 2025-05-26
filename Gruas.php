@@ -531,15 +531,20 @@
       </li>
     </ul>
 
-        <div class="sidebar_footer">
-            <div class="sidebar_element">
-                <i class="fas fa-user-circle sidebar_icon"></i>
-                <div class="sidebar_user-info">
-                    <div class="sidebar_text sidebar_title">Quien Sabe por que no quiere jalar aqui</div>
-                    <div class="sidebar_text sidebar_info">Sistema de Grúas</div>
-                </div>
-            </div>
+<?php
+    session_start();
+ $_SESSION['usuario_nombre'] = $usuario['nombre'];  // El campo que corresponda
+ $_SESSION['usuario_cargo'] = $usuario['cargo'];
+?>
+<div class="sidebar_footer">
+    <div class="sidebar_element" role="contentinfo">
+        <i class="fas fa-user-circle sidebar_icon" aria-hidden="true"></i>
+        <div>
+            <div class="sidebar_text sidebar_title"><?php echo htmlspecialchars($nombre); ?></div>
+            <div class="sidebar_text sidebar_info"><?php echo htmlspecialchars($cargo); ?></div>
         </div>
+    </div>
+</div>
     </aside>
 
     <div class="main-content">

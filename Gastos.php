@@ -55,8 +55,8 @@
 
 <?php
     session_start();
-    $nombre = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Usuario';
-    $cargo  = isset($_SESSION['usuario_cargo']) ? $_SESSION['usuario_cargo'] : '';
+ $_SESSION['usuario_nombre'] = $usuario['nombre'];  // El campo que corresponda
+ $_SESSION['usuario_cargo'] = $usuario['cargo'];
 ?>
 <div class="sidebar_footer">
     <div class="sidebar_element" role="contentinfo">
