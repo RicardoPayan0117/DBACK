@@ -57,7 +57,7 @@ $result = $conn->query($query);
       </li>
       
       <li class="sidebar_element" role="menuitem">
-        <a href="Empleados.html" class="sidebar_link">
+        <a href="Empleados.php" class="sidebar_link">
           <i class="bi bi-people sidebar_icon"></i>
           <span class="sidebar_text">Empleados</span>
         </a>

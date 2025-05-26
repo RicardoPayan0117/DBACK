@@ -1,42 +1,11 @@
 <?php
-// Función para crear la base de datos y tablas si no existen
-function initializeDatabase($conn) {
-    // Crear la base de datos si no existe
-    $conn->query("CREATE DATABASE IF NOT EXISTS DBACK");
-    $conn->select_db("DBACK");
-    
-    // Crear tabla de usuarios si no existe
-    $conn->query("CREATE TABLE IF NOT EXISTS usuarios (
-        ID INT AUTO_INCREMENT PRIMARY KEY,
-        NOMBRE VARCHAR(50) NOT NULL,
-        USUARIO VARCHAR(30) NOT NULL UNIQUE,
-        CONTRASEÑA VARCHAR(100) NOT NULL,
-        CARGO VARCHAR(50) NOT NULL,
-        FECHA_CREACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-    
-    // Verificar si ya existen usuarios
-    $result = $conn->query("SELECT COUNT(*) as total FROM usuarios");
-    $row = $result->fetch_assoc();
-    
-    if ($row['total'] == 0) {
-        // Insertar usuarios iniciales
-        $conn->query("INSERT INTO usuarios (NOMBRE, USUARIO, CONTRASEÑA, CARGO) VALUES
-            ('Paya Rodríguez', 'paya', SHA1('paya123'), 'Administrador'),
-            ('Angel Gómez', 'angel', SHA1('angel123'), 'Supervisor'),
-            ('Humberto López', 'humberto', SHA1('humberto123'), 'Operador'),
-            ('María Fernández', 'maria', SHA1('maria123'), 'Contadora'),
-            ('Carlos Mendez', 'carlos', SHA1('carlos123'), 'Técnico')");
-    }
-}
-
 session_start();
 
 // Configuración de conexión
-$servername = "localhost";
+$servername = "127.0.0.1";
 $username = "root";
-$password = "5211";
-$dbname = "DBACK";
+$password = "Admin2024ñ";  // Cambia esto por tu contraseña real
+$dbname = "dback";
 
 $connectionMessage = "";
 $connectionStatus = false;
@@ -45,49 +14,39 @@ $passwordErrorMessage = "";
 $lastUsername = "";
 
 try {
-    // Conexión sin seleccionar base de datos primero
-    $conn = new mysqli($servername, $username, $password);
-    
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
     if ($conn->connect_error) {
         throw new Exception("Error de conexión: " . $conn->connect_error);
     }
-    
-    // Inicializar la base de datos
-    initializeDatabase($conn);
-    
-    // Reconectar específicamente a DBACK
-    $conn->close();
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    
+
     $connectionStatus = true;
-    
-    // Procesar login si se envió el formulario
+
     if (isset($_POST['Login'])) {
         $usuario = $conn->real_escape_string($_POST['IngresarUsuario']);
         $clave = $conn->real_escape_string($_POST['IngresarContraseña']);
         $lastUsername = $usuario;
-        
+
         // Verificar usuario
-        $stmt = $conn->prepare("SELECT * FROM usuarios WHERE USUARIO = ?");
+        $stmt = $conn->prepare("SELECT * FROM personal WHERE usuario = ?");
         $stmt->bind_param("s", $usuario);
         $stmt->execute();
         $userResult = $stmt->get_result();
-        
+
         if ($userResult->num_rows > 0) {
             // Verificar contraseña
-            $stmt = $conn->prepare("SELECT * FROM usuarios WHERE USUARIO = ? AND CONTRASEÑA = SHA1(?)");
+            $stmt = $conn->prepare("SELECT * FROM personal WHERE usuario = ? AND contraseña = SHA1(?)");
             $stmt->bind_param("ss", $usuario, $clave);
             $stmt->execute();
             $passwordResult = $stmt->get_result();
-            
+
             if ($passwordResult->num_rows > 0) {
                 $userData = $passwordResult->fetch_assoc();
-                $_SESSION['usuario_id'] = $userData['ID'];
-                $_SESSION['usuario_nombre'] = $userData['NOMBRE'];
-                $_SESSION['usuario_cargo'] = $userData['CARGO'];
-                $_SESSION['usuario_usuario'] = $userData['USUARIO'];
-                
-                // Redirigir después de 2 segundos
+                $_SESSION['usuario_id'] = $userData['id'];
+                $_SESSION['usuario_nombre'] = $userData['nombre'];
+                $_SESSION['usuario_cargo'] = $userData['cargo'];
+                $_SESSION['usuario_usuario'] = $userData['usuario'];
+
                 echo "<script>
                     setTimeout(function() {
                         window.location.href = 'MenuAdmin.php';
@@ -102,17 +61,17 @@ try {
         }
         $stmt->close();
     }
-    
 } catch (Exception $e) {
     $connectionMessage = "<p style='color: red; text-align: center;'>Error: " . $e->getMessage() . "</p>";
     $connectionStatus = false;
 }
 
-// Cerrar conexión al final
 if (isset($conn) && $conn instanceof mysqli) {
     $conn->close();
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="es">

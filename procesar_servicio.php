@@ -2,7 +2,7 @@
 // Configuración de la base de datos
 $servername = "localhost";
 $username = "root";
-$password = "5211";
+$password = "Admin2024ñ";
 $dbname = "DBACK";
 
 
@@ -132,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
     
-    $stmt->close();
+  //  $stmt->close();
 }
 
 $conn->close();

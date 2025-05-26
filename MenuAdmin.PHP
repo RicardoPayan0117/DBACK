@@ -47,7 +47,7 @@
             </li>
 
             <li class="sidebar_element" role="menuitem" onclick="showSection('panel-solicitud')" tabindex="0" aria-label="Panel de solicitud">
-                <a href="solicitud.hmtl" class="sidebar_link">
+                <a href="solicitud.html" class="sidebar_link">
                     <i class="fas fa-clipboard-list sidebar_icon" aria-hidden="true"></i>
                     <span class="sidebar_text">Panel de solicitud</span>
                 </a>

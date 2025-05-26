@@ -517,26 +517,25 @@
       </li>
       
       <li class="sidebar_element" role="menuitem">
-        <a href="Empleados.html" class="sidebar_link">
+        <a href="Empleados.php" class="sidebar_link">
           <i class="bi bi-people sidebar_icon"></i>
           <span class="sidebar_text">Empleados</span>
         </a>
       </li>
 
       <li class="sidebar_element active" role="menuitem" aria-current="page">
-        <a href="panel-solicitud.html" class="sidebar_link">
+        <a href="solicitud.html" class="sidebar_link">
           <i class="bi bi-clipboard2-check sidebar_icon"></i>
           <span class="sidebar_text">Panel de Solicitud</span>
         </a>
       </li>
     </ul>
 
-
         <div class="sidebar_footer">
             <div class="sidebar_element">
                 <i class="fas fa-user-circle sidebar_icon"></i>
                 <div class="sidebar_user-info">
-                    <div class="sidebar_text sidebar_title">Administrador</div>
+                    <div class="sidebar_text sidebar_title">Quien Sabe por que no quiere jalar aqui</div>
                     <div class="sidebar_text sidebar_info">Sistema de Grúas</div>
                 </div>
             </div>

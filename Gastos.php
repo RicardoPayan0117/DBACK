@@ -39,29 +39,35 @@
             </li>
             
             <li class="sidebar_element" role="menuitem" onclick="showSection('empleados')" tabindex="0" aria-label="Empleados">
-                <a href="Empleados.html" class="sidebar_link">
+                <a href="Empleados.php" class="sidebar_link">
                     <i class="fas fa-users sidebar_icon" aria-hidden="true"></i>
                     <span class="sidebar_text">Empleados</span>
                 </a>
             </li>
 
             <li class="sidebar_element" role="menuitem" onclick="showSection('panel-solicitud')" tabindex="0" aria-label="Panel de solicitud">
-                <a href="panel-solicitud.html" class="sidebar_link">
+                <a href="solicitud.html" class="sidebar_link">
                     <i class="fas fa-clipboard-list sidebar_icon" aria-hidden="true"></i>
                     <span class="sidebar_text">Panel de solicitud</span>
                 </a>
             </li>
         </ul>
 
-        <div class="sidebar_footer">
-            <div class="sidebar_element" role="contentinfo">
-                <i class="fas fa-user-circle sidebar_icon" aria-hidden="true"></i>
-                <div>
-                    <div class="sidebar_text sidebar_title">Ricardo Payán</div>
-                    <div class="sidebar_text sidebar_info">Ingeniero de Software</div>
-                </div>
-            </div>
+<?php
+    session_start();
+    $nombre = isset($_SESSION['usuario_nombre']) ? $_SESSION['usuario_nombre'] : 'Usuario';
+    $cargo  = isset($_SESSION['usuario_cargo']) ? $_SESSION['usuario_cargo'] : '';
+?>
+<div class="sidebar_footer">
+    <div class="sidebar_element" role="contentinfo">
+        <i class="fas fa-user-circle sidebar_icon" aria-hidden="true"></i>
+        <div>
+            <div class="sidebar_text sidebar_title"><?php echo htmlspecialchars($nombre); ?></div>
+            <div class="sidebar_text sidebar_info"><?php echo htmlspecialchars($cargo); ?></div>
         </div>
+    </div>
+</div>
+
     </nav>
 
     <!-- Contenido principal mejorado -->

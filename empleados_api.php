@@ -1,4 +1,4 @@
-<?php
+<?php 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -8,8 +8,7 @@ header('Content-Type: application/json');
 $host = 'localhost';
 $dbname = 'dback';
 $username = 'root';
-$password = '5211';
-
+$password = 'Admin2024ñ';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
@@ -19,13 +18,8 @@ try {
     die(json_encode(['success' => false, 'message' => 'Error de conexión: ' . $e->getMessage()]));
 }
 
-// Obtener datos de la solicitud
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 $action = $_GET['action'] ?? $input['action'] ?? '';
-
-// Registrar para depuración (opcional)
-error_log("Acción recibida: $action");
-error_log("Datos recibidos: " . print_r(array_merge($_GET, $input), true));
 
 switch ($action) {
     case 'get_employees':
@@ -58,18 +52,16 @@ function handleGetEmployees($pdo) {
     $params = [];
     
     if (!empty($search)) {
-        $where = "WHERE firstName LIKE :search OR lastName LIKE :search OR email LIKE :search OR department LIKE :search";
+        $where = "WHERE nombre LIKE :search OR apellido_paterno LIKE :search OR apellido_materno LIKE :search OR cargo LIKE :search OR email LIKE :search";
         $params[':search'] = "%$search%";
     }
     
     try {
-        // Contar total
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM empleados $where");
+        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM personal $where");
         $countStmt->execute($params);
         $total = $countStmt->fetchColumn();
         
-        // Obtener registros
-        $stmt = $pdo->prepare("SELECT * FROM empleados $where ORDER BY id LIMIT :limit OFFSET :offset");
+        $stmt = $pdo->prepare("SELECT * FROM personal $where ORDER BY id LIMIT :limit OFFSET :offset");
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
@@ -92,12 +84,12 @@ function handleGetEmployee($pdo, $id) {
         echo json_encode(['success' => false, 'message' => 'ID inválido']);
         return;
     }
-    
+
     try {
-        $stmt = $pdo->prepare("SELECT * FROM empleados WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM personal WHERE id = ?");
         $stmt->execute([$id]);
         $employee = $stmt->fetch();
-        
+
         if ($employee) {
             echo json_encode(['success' => true, 'employee' => $employee]);
         } else {
@@ -109,30 +101,39 @@ function handleGetEmployee($pdo, $id) {
 }
 
 function handleAddEmployee($pdo, $data) {
-    $required = ['firstName', 'lastName', 'email', 'department', 'salary'];
+    $required = ['nombre', 'apellido_paterno', 'apellido_materno', 'cargo', 'sueldo_diario', 'telefono', 'email'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
             echo json_encode(['success' => false, 'message' => "Falta el campo $field"]);
             return;
         }
     }
-    
+
     try {
-        $stmt = $pdo->prepare("INSERT INTO empleados (firstName, lastName, email, department, salary) VALUES (?, ?, ?, ?, ?)");
+        // Verifica que no se repita el email
+        $checkStmt = $pdo->prepare("SELECT id FROM personal WHERE email = ?");
+        $checkStmt->execute([$data['email']]);
+        if ($checkStmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'El email ya está registrado']);
+            return;
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO personal (nombre, apellido_paterno, apellido_materno, usuario, contraseña, cargo, sueldo_diario, telefono, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
-            $data['firstName'],
-            $data['lastName'],
-            $data['email'],
-            $data['department'],
-            $data['salary']
+            $data['nombre'],
+            $data['apellido_paterno'],
+            $data['apellido_materno'],
+            $data['usuario'],
+            $data['contraseña'],
+            $data['cargo'],
+            $data['sueldo_diario'],
+            $data['telefono'],
+            $data['email']
         ]);
-        
+
         echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
     } catch (PDOException $e) {
-        $message = strpos($e->getMessage(), 'Duplicate entry') !== false 
-            ? 'El email ya está registrado' 
-            : 'Error al agregar: ' . $e->getMessage();
-        echo json_encode(['success' => false, 'message' => $message]);
+        echo json_encode(['success' => false, 'message' => 'Error al agregar: ' . $e->getMessage()]);
     }
 }
 
@@ -141,35 +142,38 @@ function handleUpdateEmployee($pdo, $data) {
         echo json_encode(['success' => false, 'message' => 'ID inválido']);
         return;
     }
-    
-    $required = ['firstName', 'lastName', 'email', 'department', 'salary'];
+
+    $required = ['nombre', 'apellido_paterno', 'apellido_materno', 'usuario', 'contraseña', 'cargo', 'sueldo_diario', 'telefono', 'email'];
     foreach ($required as $field) {
         if (empty($data[$field])) {
             echo json_encode(['success' => false, 'message' => "Falta el campo $field"]);
             return;
         }
     }
-    
+
     try {
         // Verificar email único
-        $checkStmt = $pdo->prepare("SELECT id FROM empleados WHERE email = ? AND id != ?");
+        $checkStmt = $pdo->prepare("SELECT id FROM personal WHERE email = ? AND id != ?");
         $checkStmt->execute([$data['email'], $data['id']]);
-        
         if ($checkStmt->fetch()) {
             echo json_encode(['success' => false, 'message' => 'El email ya está registrado']);
             return;
         }
-        
-        $stmt = $pdo->prepare("UPDATE empleados SET firstName=?, lastName=?, email=?, department=?, salary=? WHERE id=?");
+
+        $stmt = $pdo->prepare("UPDATE personal SET nombre=?, apellido_paterno=?, apellido_materno=?, usuario =?, contraseña =?, cargo=?, sueldo_diario=?, telefono=?, email=? WHERE id=?");
         $stmt->execute([
-            $data['firstName'],
-            $data['lastName'],
+            $data['nombre'],
+            $data['apellido_paterno'],
+            $data['apellido_materno'],
+            $data['usuario'],
+            $data['contraseña'],
+            $data['cargo'],
+            $data['sueldo_diario'],
+            $data['telefono'],
             $data['email'],
-            $data['department'],
-            $data['salary'],
             $data['id']
         ]);
-        
+
         echo json_encode(['success' => true, 'affected_rows' => $stmt->rowCount()]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Error al actualizar: ' . $e->getMessage()]);
@@ -181,11 +185,11 @@ function handleDeleteEmployee($pdo, $data) {
         echo json_encode(['success' => false, 'message' => 'ID inválido']);
         return;
     }
-    
+
     try {
-        $stmt = $pdo->prepare("DELETE FROM empleados WHERE id = ?");
+        $stmt = $pdo->prepare("DELETE FROM personal WHERE id = ?");
         $stmt->execute([$data['id']]);
-        
+
         echo json_encode(['success' => $stmt->rowCount() > 0]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Error al eliminar: ' . $e->getMessage()]);
