@@ -4,7 +4,7 @@ session_start();
 // Configuración de conexión
 $servername = "localhost";
 $username = "root";
-$password = "5211";  // Cambia esto por tu contraseña real
+$password = "Admin2024ñ";  // Cambia esto por tu contraseña real
 $dbname = "dback";
 
 $connectionMessage = "";
@@ -57,7 +57,7 @@ try {
                 $passwordErrorMessage = "Contraseña incorrecta.";
             }
         } else {
-            $userErrorMessage = "El usuario no existe.";
+            $userErrorMessage = "Credenciales incorrectas.";
         }
         $stmt->close();
     }
@@ -70,8 +70,6 @@ if (isset($conn) && $conn instanceof mysqli) {
     $conn->close();
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="es">

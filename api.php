@@ -7,7 +7,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 // Configuración de la base de datos
 $servername = "localhost";
 $username = "root";
-$password = "5211";  // Cambia esto por tu contraseña real
+$password = "Admin2024ñ";  // Cambia esto por tu contraseña real
 $dbname = "DBACK";
 
 // Manejar solicitudes OPTIONS para CORS

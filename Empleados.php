@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario_nombre'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -47,17 +55,12 @@
                 </a>
             </li>
         </ul>
-<?php
-    session_start();
- $_SESSION['usuario_nombre'] = $usuario['nombre'];  // El campo que corresponda
- $_SESSION['usuario_cargo'] = $usuario['cargo'];
-?>
 <div class="sidebar_footer">
     <div class="sidebar_element" role="contentinfo">
         <i class="fas fa-user-circle sidebar_icon" aria-hidden="true"></i>
         <div>
-            <div class="sidebar_text sidebar_title"><?php echo htmlspecialchars($nombre); ?></div>
-            <div class="sidebar_text sidebar_info"><?php echo htmlspecialchars($cargo); ?></div>
+            <div class="sidebar_text sidebar_title"><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?></div>
+            <div class="sidebar_text sidebar_info"><?php echo htmlspecialchars($_SESSION['usuario_cargo']); ?></div>
         </div>
     </div>
 </div>
