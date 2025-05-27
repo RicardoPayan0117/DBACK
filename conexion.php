@@ -2,7 +2,7 @@
 // Configuración de la base de datos
 $servername = "localhost";
 $username = "root";
-$password = "Admin2024ñ";  // Cambia esto por tu contraseña real
+$password = "5211";  // Cambia esto por tu contraseña real
 $dbname = "DBACK";
 
 // Crear conexión

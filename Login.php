@@ -2,9 +2,9 @@
 session_start();
 
 // Configuración de conexión
-$servername = "127.0.0.1";
+$servername = "localhost";
 $username = "root";
-$password = "Admin2024ñ";  // Cambia esto por tu contraseña real
+$password = "5211";  // Cambia esto por tu contraseña real
 $dbname = "dback";
 
 $connectionMessage = "";
