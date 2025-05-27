@@ -1,3 +1,83 @@
+<?php
+// Configuración de conexión
+$servername = "localhost";
+$username = "root";
+$password = "5211";  // Cambia esto por tu contraseña real
+$dbname = "dback";
+
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Verificar conexión
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Procesar el formulario si se envió
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Recoger y sanitizar los datos del formulario
+    $nombre = $conn->real_escape_string($_POST['nombre']);
+    $telefono = $conn->real_escape_string($_POST['telefono']);
+    $email = $conn->real_escape_string($_POST['email']);
+    $ubicacion_origen = $conn->real_escape_string($_POST['ubicacion_origen']);
+    $ubicacion_destino = $conn->real_escape_string($_POST['ubicacion_destino']);
+    $vehiculo = $conn->real_escape_string($_POST['vehiculo']);
+    $marca = $conn->real_escape_string($_POST['marca']);
+    $modelo = $conn->real_escape_string($_POST['modelo']);
+    $tipo_servicio = $conn->real_escape_string($_POST['tipo_servicio']);
+    $descripcion = $conn->real_escape_string($_POST['descripcion']);
+    $urgencia = $conn->real_escape_string($_POST['urgencia']);
+    $distancia = $conn->real_escape_string($_POST['distancia']);
+    $costo = $conn->real_escape_string($_POST['costo']);
+    $metodo_pago = $conn->real_escape_string($_POST['metodo_pago_seleccionado']);
+    $paypal_order_id = $conn->real_escape_string($_POST['paypal_order_id']);
+    $paypal_status = $conn->real_escape_string($_POST['paypal_status']);
+    $paypal_email = $conn->real_escape_string($_POST['paypal_email']);
+    $paypal_name = $conn->real_escape_string($_POST['paypal_name']);
+    $consentimiento = isset($_POST['consentimiento']) ? 1 : 0;
+    
+    // Procesar la foto del vehículo
+    $foto_nombre = '';
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
+        $foto_tmp = $_FILES['foto']['tmp_name'];
+        $foto_nombre = basename($_FILES['foto']['name']);
+        $upload_dir = "uploads/";
+        
+        // Crear directorio si no existe
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        // Mover el archivo al directorio de uploads
+        move_uploaded_file($foto_tmp, $upload_dir . $foto_nombre);
+    }
+    
+    // Insertar en la base de datos
+    $sql = "INSERT INTO solicitudes_servicio (
+        nombre, telefono, email, ubicacion_origen, ubicacion_destino, 
+        vehiculo, marca, modelo, foto_vehiculo, tipo_servicio, 
+        descripcion, urgencia, distancia, costo, metodo_pago, 
+        paypal_order_id, paypal_status, paypal_email, paypal_name, 
+        consentimiento, fecha_solicitud
+    ) VALUES (
+        '$nombre', '$telefono', '$email', '$ubicacion_origen', '$ubicacion_destino', 
+        '$vehiculo', '$marca', '$modelo', '$foto_nombre', '$tipo_servicio', 
+        '$descripcion', '$urgencia', '$distancia', '$costo', '$metodo_pago', 
+        '$paypal_order_id', '$paypal_status', '$paypal_email', '$paypal_name', 
+        $consentimiento, NOW()
+    )";
+    
+    if ($conn->query($sql) === TRUE) {
+        $success_message = "Solicitud enviada con éxito. ID: " . $conn->insert_id;
+    } else {
+        $error_message = "Error: " . $sql . "<br>" . $conn->error;
+    }
+    
+    // Cerrar conexión
+    $conn->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,13 +92,13 @@
     <header>
         <nav class="navbar" aria-label="Navegación principal">
             <div class="nav-content">
-                <a href="index.html" class="navbar-brand">
+                <a href="index.php" class="navbar-brand">
                     <img src="Elementos/LogoDBACK.png" alt="Logo DBACK" width="50" height="50">
                     <h1>Grúas DBACK</h1>
                 </a>
                 
                 <div class="nav-links">
-                    <a href="index.html" class="cta-button">Inicio</a>
+                    <a href="index.php" class="cta-button">Inicio</a>
                     <a href="tel:+526688253351" class="cta-button accent">Llamar ahora</a>
                 </div>
             </div>
@@ -26,11 +106,23 @@
     </header>
 
     <main>
+        <?php if (isset($success_message)): ?>
+        <div class="success-message">
+            <?php echo $success_message; ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (isset($error_message)): ?>
+        <div class="error-message">
+            <?php echo $error_message; ?>
+        </div>
+        <?php endif; ?>
+        
         <section class="formulario" aria-labelledby="form-title">
             <h2 id="form-title">Solicitar Servicio de Grúa</h2>
             <p class="form-description">Complete el formulario y nos pondremos en contacto lo antes posible.</p>
             
-            <form action="procesar_servicio.php" method="post" id="servicioForm" enctype="multipart/form-data" novalidate>
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="servicioForm" enctype="multipart/form-data" novalidate>
                 <!-- Información de contacto -->
                 <fieldset>
                     <legend>Información de contacto</legend>
@@ -41,7 +133,8 @@
                                pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{3,50}"
                                placeholder="Ej: Pito Pérez"
                                title="Ingrese un nombre válido (solo letras y espacios, mínimo 3 caracteres)"
-                               aria-required="true">
+                               aria-required="true"
+                               value="<?php echo isset($_POST['nombre']) ? htmlspecialchars($_POST['nombre']) : ''; ?>">
                         <div id="nombre-error" class="error-message" role="alert">Por favor ingrese un nombre válido (mínimo 3 caracteres, solo letras y espacios)</div>
                     </div>
 
@@ -51,7 +144,8 @@
                                pattern="(\d{10}|\d{3}-\d{3}-\d{4})"
                                placeholder="Ej: 6681234567 o 668-123-4567"
                                title="Formato requerido: XXXXXXXXXX o XXX-XXX-XXXX"
-                               aria-required="true">
+                               aria-required="true"
+                               value="<?php echo isset($_POST['telefono']) ? htmlspecialchars($_POST['telefono']) : ''; ?>">
                         <div id="telefono-error" class="error-message" role="alert">Por favor ingrese un teléfono válido (10 dígitos o formato XXX-XXX-XXXX)</div>
                     </div>
 
@@ -60,7 +154,8 @@
                         <input type="email" id="email" name="email" 
                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                placeholder="Ej: juan@ejemplo.com"
-                               title="Ingrese un correo electrónico válido">
+                               title="Ingrese un correo electrónico válido"
+                               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                         <div id="email-error" class="error-message" role="alert">Por favor ingrese un correo electrónico válido</div>
                     </div>
                 </fieldset>
@@ -79,7 +174,8 @@
                                        placeholder="Dirección o punto de referencia" 
                                        list="ubicaciones_origen"
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
-                                       aria-required="true">
+                                       aria-required="true"
+                                       value="<?php echo isset($_POST['ubicacion_origen']) ? htmlspecialchars($_POST['ubicacion_origen']) : ''; ?>">
                                 <button type="button" id="obtenerUbicacionOrigen" class="location-button" aria-label="Obtener mi ubicación actual">
                                     <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
                                 </button>
@@ -99,7 +195,8 @@
                                        placeholder="Dirección o punto de referencia" 
                                        list="ubicaciones_destino"
                                        title="Ingrese una ubicación válida (mínimo 5 caracteres)"
-                                       aria-required="true">
+                                       aria-required="true"
+                                       value="<?php echo isset($_POST['ubicacion_destino']) ? htmlspecialchars($_POST['ubicacion_destino']) : ''; ?>">
                                 <button type="button" id="obtenerUbicacionDestino" class="location-button" aria-label="Obtener mi ubicación actual">
                                     <img src="https://cdn-icons-png.flaticon.com/512/535/535137.png" alt="Ubicación" width="20" height="20">
                                 </button>
@@ -118,11 +215,11 @@
                         <label for="vehiculo">Tipo de vehículo:</label>
                         <select id="vehiculo" name="vehiculo" required aria-required="true">
                             <option value="">Seleccione una opción</option>
-                            <option value="automovil">Automóvil</option>
-                            <option value="camioneta">Camioneta</option>
-                            <option value="motocicleta">Motocicleta</option>
-                            <option value="camion">Camión</option>
-                            <option value="bicicleta">Baica</option> <!-- Unica Linea escrita por Humberto Roman-->
+                            <option value="automovil" <?php echo (isset($_POST['vehiculo']) && $_POST['vehiculo'] == 'automovil') ? 'selected' : ''; ?>>Automóvil</option>
+                            <option value="camioneta" <?php echo (isset($_POST['vehiculo']) && $_POST['vehiculo'] == 'camioneta') ? 'selected' : ''; ?>>Camioneta</option>
+                            <option value="motocicleta" <?php echo (isset($_POST['vehiculo']) && $_POST['vehiculo'] == 'motocicleta') ? 'selected' : ''; ?>>Motocicleta</option>
+                            <option value="camion" <?php echo (isset($_POST['vehiculo']) && $_POST['vehiculo'] == 'camion') ? 'selected' : ''; ?>>Camión</option>
+                            <option value="bicicleta" <?php echo (isset($_POST['vehiculo']) && $_POST['vehiculo'] == 'bicicleta') ? 'selected' : ''; ?>>Baica</option>
                         </select>
                         <div id="vehiculo-error" class="error-message" role="alert">Por favor seleccione un tipo de vehículo</div>
                     </div>
@@ -132,7 +229,8 @@
                         <input type="text" id="marca" name="marca" required
                                minlength="2"
                                placeholder="Ej: Toyota, Ford, Nissan"
-                               aria-required="true">
+                               aria-required="true"
+                               value="<?php echo isset($_POST['marca']) ? htmlspecialchars($_POST['marca']) : ''; ?>">
                         <div id="marca-error" class="error-message" role="alert">Por favor ingrese la marca del vehículo (mínimo 2 caracteres)</div>
                     </div>
                     
@@ -141,7 +239,8 @@
                         <input type="text" id="modelo" name="modelo" required
                                minlength="2"
                                placeholder="Ej: Corolla, F-150, Sentra"
-                               aria-required="true">
+                               aria-required="true"
+                               value="<?php echo isset($_POST['modelo']) ? htmlspecialchars($_POST['modelo']) : ''; ?>">
                         <div id="modelo-error" class="error-message" role="alert">Por favor ingrese el modelo del vehículo (mínimo 2 caracteres)</div>
                     </div>
 
@@ -161,12 +260,12 @@
                         <label for="tipo_servicio">Tipo de Servicio:</label>
                         <select id="tipo_servicio" name="tipo_servicio" required aria-required="true">
                             <option value="">Seleccione una opción</option>
-                            <option value="remolque">Remolque</option>
-                            <option value="bateria">Cambio de batería</option>
-                            <option value="gasolina">Suministro de gasolina</option>
-                            <option value="llanta">Cambio de llanta</option>
-                            <option value="arranque">Servicio de arranque</option>
-                            <option value="otro">Otro servicio</option>
+                            <option value="remolque" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'remolque') ? 'selected' : ''; ?>>Remolque</option>
+                            <option value="bateria" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'bateria') ? 'selected' : ''; ?>>Cambio de batería</option>
+                            <option value="gasolina" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'gasolina') ? 'selected' : ''; ?>>Suministro de gasolina</option>
+                            <option value="llanta" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'llanta') ? 'selected' : ''; ?>>Cambio de llanta</option>
+                            <option value="arranque" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'arranque') ? 'selected' : ''; ?>>Servicio de arranque</option>
+                            <option value="otro" <?php echo (isset($_POST['tipo_servicio']) && $_POST['tipo_servicio'] == 'otro') ? 'selected' : ''; ?>>Otro servicio</option>
                         </select>
                         <div id="tipo_servicio-error" class="error-message" role="alert">Por favor seleccione un tipo de servicio</div>
                     </div>
@@ -176,16 +275,16 @@
                         <textarea id="descripcion" name="descripcion" rows="4" 
                                   minlength="10" maxlength="500"
                                   placeholder="Describa brevemente la situación"
-                                  title="La descripción debe tener entre 10 y 500 caracteres"></textarea>
+                                  title="La descripción debe tener entre 10 y 500 caracteres"><?php echo isset($_POST['descripcion']) ? htmlspecialchars($_POST['descripcion']) : ''; ?></textarea>
                         <div id="descripcion-error" class="error-message" role="alert">La descripción debe tener entre 10 y 500 caracteres</div>
                     </div>
 
                     <div class="form-group">
                         <label for="urgencia">Nivel de urgencia:</label>
                         <select id="urgencia" name="urgencia" required aria-required="true">
-                            <option value="normal">Normal</option>
-                            <option value="urgente">Urgente</option>
-                            <option value="emergencia">Emergencia</option>
+                            <option value="normal" <?php echo (isset($_POST['urgencia']) && $_POST['urgencia'] == 'normal') ? 'selected' : ''; ?>>Normal</option>
+                            <option value="urgente" <?php echo (isset($_POST['urgencia']) && $_POST['urgencia'] == 'urgente') ? 'selected' : ''; ?>>Urgente</option>
+                            <option value="emergencia" <?php echo (isset($_POST['urgencia']) && $_POST['urgencia'] == 'emergencia') ? 'selected' : ''; ?>>Emergencia</option>
                         </select>
                     </div>
                 </fieldset>
@@ -195,13 +294,13 @@
                     <div class="form-group">
                         <label for="distancia">Distancia estimada:</label>
                         <input type="text" id="distancia" name="distancia" readonly 
-                               placeholder="Calculando..." value="" aria-readonly="true">
+                               placeholder="Calculando..." value="<?php echo isset($_POST['distancia']) ? htmlspecialchars($_POST['distancia']) : ''; ?>" aria-readonly="true">
                     </div>
                     
                     <div class="form-group">
                         <label for="costo">Costo estimado:</label>
                         <input type="text" id="costo" name="costo" readonly 
-                               placeholder="Calculando..." value="" aria-readonly="true">
+                               placeholder="Calculando..." value="<?php echo isset($_POST['costo']) ? htmlspecialchars($_POST['costo']) : ''; ?>" aria-readonly="true">
                     </div>
                 </div>
                 
@@ -210,27 +309,27 @@
                     <h3>Resumen de Solicitud</h3>
                     <div class="summary-row">
                         <span>Cliente:</span>
-                        <span id="display-nombre">(Por completar)</span>
+                        <span id="display-nombre"><?php echo isset($_POST['nombre']) ? htmlspecialchars($_POST['nombre']) : '(Por completar)'; ?></span>
                     </div>
                     <div class="summary-row">
                         <span>Correo:</span>
-                        <span id="display-email">(No especificado)</span>
+                        <span id="display-email"><?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '(No especificado)'; ?></span>
                     </div>
                     <div class="summary-row">
                         <span>Distancia estimada:</span>
-                        <span id="display-distancia">0 km</span>
+                        <span id="display-distancia"><?php echo isset($_POST['distancia']) ? htmlspecialchars($_POST['distancia']) : '0 km'; ?></span>
                     </div>
                     <div class="summary-row">
                         <span>Costo total estimado:</span>
-                        <span id="display-costo">$0.00 MXN</span>
+                        <span id="display-costo"><?php echo isset($_POST['costo']) ? '$' . htmlspecialchars($_POST['costo']) . ' MXN' : '$0.00 MXN'; ?></span>
                     </div>
                     <div class="summary-row">
                         <span>Depósito requerido (20%):</span>
-                        <span id="display-deposito">$0.00 MXN</span>
+                        <span id="display-deposito"><?php echo isset($_POST['costo']) ? '$' . number_format($_POST['costo'] * 0.2, 2) . ' MXN' : '$0.00 MXN'; ?></span>
                     </div>
                     <div class="summary-row">
                         <span>Pago restante:</span>
-                        <span id="display-restante">$0.00 MXN</span>
+                        <span id="display-restante"><?php echo isset($_POST['costo']) ? '$' . number_format($_POST['costo'] * 0.8, 2) . ' MXN' : '$0.00 MXN'; ?></span>
                     </div>
                 </div>
                 
@@ -245,7 +344,7 @@
                         <h4 id="payment-methods-label">Seleccione método de pago:</h4>
                         
                         <div class="payment-method" tabindex="0" role="radio" aria-checked="true" onclick="selectPaymentMethod('efectivo')" onkeydown="handlePaymentMethodKey(event, 'efectivo')">
-                            <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo" checked>
+                            <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo" <?php echo (!isset($_POST['metodo_pago_seleccionado']) || $_POST['metodo_pago_seleccionado'] == 'efectivo') ? 'checked' : ''; ?>>
                             <img src="https://cdn-icons-png.flaticon.com/512/639/639365.png" alt="Efectivo" class="payment-method-icon" width="40" height="40">
                             <div class="payment-method-details">
                                 <h4 class="payment-method-title">Efectivo</h4>
@@ -254,7 +353,7 @@
                         </div>
                         
                         <div class="payment-method" tabindex="0" role="radio" aria-checked="false" onclick="selectPaymentMethod('paypal')" onkeydown="handlePaymentMethodKey(event, 'paypal')">
-                            <input type="radio" name="metodo_pago" id="metodo_paypal" value="paypal">
+                            <input type="radio" name="metodo_pago" id="metodo_paypal" value="paypal" <?php echo (isset($_POST['metodo_pago_seleccionado']) && $_POST['metodo_pago_seleccionado'] == 'paypal') ? 'checked' : ''; ?>>
                             <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="payment-method-icon" width="40" height="40">
                             <div class="payment-method-details">
                                 <h4 class="payment-method-title">PayPal</h4>
@@ -264,40 +363,52 @@
                     </div>
                     
                     <!-- Contenedor para efectivo -->
-                    <div id="efectivo-container" class="payment-container">
+                    <div id="efectivo-container" class="payment-container" style="<?php echo (!isset($_POST['metodo_pago_seleccionado']) || $_POST['metodo_pago_seleccionado'] == 'efectivo') ? 'display:block;' : 'display:none;'; ?>">
                         <p>Ha seleccionado pago en efectivo.</p>
-                        <p>El monto total de <strong id="efectivo-total">$0.00 MXN</strong> deberá ser pagado al finalizar el servicio.</p>
+                        <p>El monto total de <strong id="efectivo-total"><?php echo isset($_POST['costo']) ? '$' . htmlspecialchars($_POST['costo']) . ' MXN' : '$0.00 MXN'; ?></strong> deberá ser pagado al finalizar el servicio.</p>
                         <p><strong>Nota:</strong> Al elegir este método, un operador se pondrá en contacto con usted para confirmar los detalles.</p>
                     </div>
                     
                     <!-- Contenedor del botón de PayPal -->
-                    <div id="paypal-container" class="payment-container" style="display:none;">
+                    <div id="paypal-container" class="payment-container" style="<?php echo (isset($_POST['metodo_pago_seleccionado']) && $_POST['metodo_pago_seleccionado'] == 'paypal') ? 'display:block;' : 'display:none;'; ?>">
                         <div id="paypal-button-container">
+                            <?php if (isset($_POST['paypal_order_id']) && $_POST['paypal_order_id'] != ''): ?>
+                            <div class="paypal-success">
+                                <h4>¡Pago completado con éxito!</h4>
+                                <p>ID de transacción: <?php echo htmlspecialchars($_POST['paypal_order_id']); ?></p>
+                                <p>Estado: <?php echo htmlspecialchars($_POST['paypal_status']); ?></p>
+                            </div>
+                            <?php else: ?>
                             <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
                                 <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo" width="20" height="20">
                                 Pagar con PayPal
                             </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                     
-                    <input type="hidden" id="paypal_order_id" name="paypal_order_id">
-                    <input type="hidden" id="paypal_status" name="paypal_status">
-                    <input type="hidden" id="paypal_email" name="paypal_email">
-                    <input type="hidden" id="paypal_name" name="paypal_name">
-                    <input type="hidden" id="metodo_pago_seleccionado" name="metodo_pago_seleccionado" value="efectivo">
+                    <input type="hidden" id="paypal_order_id" name="paypal_order_id" value="<?php echo isset($_POST['paypal_order_id']) ? htmlspecialchars($_POST['paypal_order_id']) : ''; ?>">
+                    <input type="hidden" id="paypal_status" name="paypal_status" value="<?php echo isset($_POST['paypal_status']) ? htmlspecialchars($_POST['paypal_status']) : ''; ?>">
+                    <input type="hidden" id="paypal_email" name="paypal_email" value="<?php echo isset($_POST['paypal_email']) ? htmlspecialchars($_POST['paypal_email']) : ''; ?>">
+                    <input type="hidden" id="paypal_name" name="paypal_name" value="<?php echo isset($_POST['paypal_name']) ? htmlspecialchars($_POST['paypal_name']) : ''; ?>">
+                    <input type="hidden" id="metodo_pago_seleccionado" name="metodo_pago_seleccionado" value="<?php echo isset($_POST['metodo_pago_seleccionado']) ? htmlspecialchars($_POST['metodo_pago_seleccionado']) : 'efectivo'; ?>">
                 </fieldset>
 
                 <!-- Checkbox para confirmar consentimiento -->
                 <div id="privacy-container" class="privacy-checkbox-container">
-                    <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true">
+                    <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true" <?php echo isset($_POST['consentimiento']) ? 'checked' : ''; ?>>
                     <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span></span></label>
                     <div id="consentimiento-error" class="error-message" role="alert">Debe aceptar la política de privacidad para continuar</div>
                 </div>
                 
                 <!-- Botones de acción -->
-              <div class="action-buttons">
-    <button type="submit" class="cta-button">Enviar Solicitud</button>
-</div>
+                <div class="action-buttons">
+                    <button type="submit" class="cta-button" id="submit-button">
+                        <span id="submit-text">Enviar Solicitud</span>
+                        <span id="submit-spinner" style="display:none;">Procesando...</span>
+                    </button>
+                </div>
+            </form>
             <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
         </section>
 
@@ -372,7 +483,7 @@
 
     <script>
         // Variables globales
-        let costoTotalServicio = 0;
+        let costoTotalServicio = <?php echo isset($_POST['costo']) ? floatval($_POST['costo']) : 0; ?>;
         let paypalButtonsInitialized = false;
         
         // Función para validar un campo
@@ -972,6 +1083,13 @@
             
             // Configurar el formulario
             document.getElementById('servicioForm').addEventListener('submit', validarYEnviarFormulario);
+            
+            // Inicializar costoTotalServicio si ya hay un valor en el formulario
+            const costoInput = document.getElementById('costo');
+            if (costoInput && costoInput.value) {
+                costoTotalServicio = parseFloat(costoInput.value);
+                actualizarInfoPago();
+            }
         });
     </script>
 </body>
