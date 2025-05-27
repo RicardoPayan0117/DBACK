@@ -54,10 +54,10 @@ try {
                 </script>";
                 $connectionMessage = "<p style='color: green; text-align: center;'>Login exitoso! Redirigiendo...</p>";
             } else {
-               // $passwordErrorMessage = "Contraseña incorrecta.";
+                $passwordErrorMessage = "Contraseña incorrecta.";
             }
         } else {
-            $userErrorMessage = "Credenciales incorrectas.";
+            $userErrorMessage = "El usuario no existe.";
         }
         $stmt->close();
     }
