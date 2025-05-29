@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Usuario - Servicio de Grúas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <link rel="stylesheet" href="./CSS/notas.css">
+    
+</head>
+<body>
+
+    <!-- Contenedor principal -->
+    <div class="container">
+        <!-- Servicios recientes -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Mis Servicios Recientes</h2>
+                <a href="#" class="view-all">Ver todos</a>
+            </div>
+            <div class="service-cards">
+                <!-- Servicio en progreso -->
+                <div class="card">
+                    <div class="service-status-header status-in-progress">
+                        <span>En progreso</span>
+                        <i class="fas fa-truck-loading"></i>
+                    </div>
+                    <div class="service-content">
+                        <div class="service-title">
+                            <span>Servicio #5842</span>
+                            <span class="service-date">Hoy, 10:35 AM</span>
+                        </div>
+                        <div class="service-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Vehículo</div>
+                                    <div class="detail-value">Toyota Corolla 2020 (ABC-123)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Ubicación</div>
+                                    <div class="detail-value">Av. Reforma 345, Colonia Juárez</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Operador</div>
+                                    <div class="detail-value">Miguel Ángel González</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Estado</div>
+                                    <div class="detail-value">El operador llegará en aproximadamente 15 minutos</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="service-action">
+                                <i class="fas fa-map-marked-alt"></i> Rastrear
+                            </button>
+                            <button class="service-action">
+                                <i class="fas fa-phone"></i> Llamar
+                            </button>
+                            <button class="service-action">
+                                <i class="fas fa-times-circle"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Servicio programado -->
+                <div class="card">
+                    <div class="service-status-header status-scheduled">
+                        <span>Programado</span>
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="service-content">
+                        <div class="service-title">
+                            <span>Servicio #5843</span>
+                            <span class="service-date">Mañana, 9:00 AM</span>
+                        </div>
+                        <div class="service-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Vehículo</div>
+                                    <div class="detail-value">Honda Civic 2018 (XYZ-789)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Ubicación</div>
+                                    <div class="detail-value">Taller Mecánico "El Experto", Av. Universidad 800</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Tipo de servicio</div>
+                                    <div class="detail-value">Traslado programado</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Nota</div>
+                                    <div class="detail-value">Traslado del taller a domicilio</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="service-action">
+                                <i class="fas fa-edit"></i> Modificar
+                            </button>
+                            <button class="service-action">
+                                <i class="fas fa-times-circle"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Servicio completado -->
+                <div class="card">
+                    <div class="service-status-header status-completed">
+                        <span>Completado</span>
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="service-content">
+                        <div class="service-title">
+                            <span>Servicio #5840</span>
+                            <span class="service-date">Ayer, 15:20 PM</span>
+                        </div>
+                        <div class="service-details">
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Vehículo</div>
+                                    <div class="detail-value">Toyota Corolla 2020 (ABC-123)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Ubicación</div>
+                                    <div class="detail-value">Periférico Sur Km 15, Tlalpan</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Costo</div>
+                                    <div class="detail-value">$850.00 MXN</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="detail-text">
+                                    <div class="detail-label">Operador</div>
+                                    <div class="detail-value">Carlos Ramírez</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="service-actions">
+                            <button class="service-action">
+                                <i class="fas fa-file-invoice"></i> Factura
+                            </button>
+                            <button class="service-action">
+                                <i class="fas fa-star"></i> Calificar
+                            </button>
+                            <button class="service-action">
+                                <i class="fas fa-redo"></i> Repetir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+</body>
+</html>
