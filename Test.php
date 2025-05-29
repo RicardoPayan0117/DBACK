@@ -94,101 +94,298 @@ unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .border-bottom {
-            border-bottom: 2px solid #dee2e6 !important;
-        }
-        .card-solicitud {
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.075);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .card-solicitud:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-color: rgba(0, 123, 255, 0.2);
-        }
-        .card-header {
-            background-color: rgba(0, 0, 0, 0.03);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .badge {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            padding: 5px 10px;
-        }
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
-        }
-        .pagination {
-            margin-top: 2rem;
-        }
-        .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-        .page-link {
-            color: #0d6efd;
-        }
-        .filtros-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-        }
-        .form-select {
-            border-radius: 5px;
-        }
-        @media (max-width: 768px) {
-            .row-cols-md-2 > * {
-                flex: 0 0 auto;
-                width: 100%;
-            }
-            .filtros-container .col-md-4 {
-                margin-bottom: 1rem;
-            }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .col {
-            animation: fadeIn 0.3s ease forwards;
-            opacity: 0;
-        }
-        .col:nth-child(1) { animation-delay: 0.1s; }
-        .col:nth-child(2) { animation-delay: 0.2s; }
-        .col:nth-child(3) { animation-delay: 0.3s; }
-        .col:nth-child(4) { animation-delay: 0.4s; }
-        .col:nth-child(5) { animation-delay: 0.5s; }
-        .col:nth-child(6) { animation-delay: 0.6s; }
-        .col:nth-child(7) { animation-delay: 0.7s; }
-        .col:nth-child(8) { animation-delay: 0.8s; }
-        .alert {
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        .card-title {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-        .card-body div {
-            margin-bottom: 0.5rem;
-        }
-        .fw-bold {
-            color: #495057;
-        }
-        .id-solicitud {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
+    :root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header y navegación */
+.border-bottom {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+    padding-bottom: 1rem;
+}
+
+/* Tarjetas de solicitud */
+.card-solicitud {
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: var(--transition);
+    background-color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-solicitud:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow);
+    border-color: rgba(var(--primary-color), 0.2);
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+}
+
+.card-body {
+    flex: 1;
+    padding: 1.25rem;
+}
+
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 0.75rem 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Badges de estado */
+.badge {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* Botones */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-sm {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.825rem;
+}
+
+.btn-outline-primary {
+    border-color: rgba(var(--primary-color), 0.3);
+}
+
+.btn-outline-primary:hover {
+    background-color: rgba(var(--primary-color), 0.1);
+}
+
+/* Contenedor de filtros */
+.filtros-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
+}
+
+.form-select, .form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color), 0.1);
+}
+
+/* Paginación */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.page-link {
+    color: var(--primary-color);
+    border-radius: var(--border-radius) !important;
+    margin: 0 3px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Alertas */
+.alert {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: none;
+}
+
+/* Textos y títulos */
+.card-title {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.fw-bold {
+    color: #495057;
+    font-weight: 600 !important;
+}
+
+.id-solicitud {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    opacity: 0.8;
+}
+
+.text-muted {
+    opacity: 0.7;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.col {
+    animation: fadeIn 0.4s ease forwards;
+    opacity: 0;
+}
+
+/* Retrasos de animación para cada tarjeta */
+.col:nth-child(1) { animation-delay: 0.05s; }
+.col:nth-child(2) { animation-delay: 0.1s; }
+.col:nth-child(3) { animation-delay: 0.15s; }
+.col:nth-child(4) { animation-delay: 0.2s; }
+.col:nth-child(5) { animation-delay: 0.25s; }
+.col:nth-child(6) { animation-delay: 0.3s; }
+.col:nth-child(7) { animation-delay: 0.35s; }
+.col:nth-child(8) { animation-delay: 0.4s; }
+
+/* Efecto hover para iconos */
+.bi {
+    transition: var(--transition);
+}
+
+.btn:hover .bi {
+    transform: scale(1.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .filtros-container .col-md-4 {
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .border-bottom {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .id-solicitud {
+        margin-top: 0.5rem;
+    }
+    
+    .filtros-container {
+        padding: 1rem;
+    }
+}
+
+/* Estados con colores específicos */
+.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: var(--dark-color);
+}
+
+.bg-info {
+    background-color: var(--info-color) !important;
+    color: white;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+    color: white;
+}
+
+.bg-secondary {
+    background-color: var(--secondary-color) !important;
+    color: white;
+}
+
+/* Mejoras para el contenedor principal */
+.container-fluid {
+    padding: 0 2rem;
+    max-width: 1800px;
+}
+
+@media (max-width: 992px) {
+    .container-fluid {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 1rem;
+    }
+}
+
+/* Efecto de carga suave */
+main {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards 0.2s;
+}
+
+/* Mejora para los elementos de información en tarjetas */
+.card-body div {
+    margin-bottom: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-body span.fw-bold {
+    min-width: 80px;
+    color: var(--secondary-color);
+}
+
+/* Mejora para el footer de las tarjetas */
+.card-footer .d-flex {
+    gap: 0.5rem;
+}
+
+.card-footer .btn {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+}
     </style>
 </head>
 <body class="bg-light">
