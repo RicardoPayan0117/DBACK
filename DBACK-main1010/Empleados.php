@@ -12,7 +12,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Empleados</title>
+    <title>Gestión de Solicitudes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="./CSS/Empleados.CSS">
 </head>
@@ -62,7 +62,7 @@ if (!isset($_SESSION['usuario_nombre'])) {
             </li>
 
             <li class="sidebar_element" role="menuitem" onclick="showSection('panel-solicitud')" tabindex="0" aria-label="Panel de solicitud">
-                <a href="solicitud.php" class="sidebar_link">
+                <a href="MenuSolicitudes.PHP" class="sidebar_link">
                     <i class="fas fa-clipboard-list sidebar_icon" aria-hidden="true"></i>
                     <span class="sidebar_text">Panel de solicitud</span>
                 </a>
@@ -111,8 +111,9 @@ if (!isset($_SESSION['usuario_nombre'])) {
                             <th>Usuario</th>
                             <th>Cargo</th>
                             <th>Sueldo diario</th>
-                            <th>telefono</th>
-                            <th>email</th>
+                            <th>Telefono</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="employeesList">
@@ -243,6 +244,7 @@ function displayEmployees(employees, page = 1, total = 0) {
             <td>${employee.cargo}</td>
             <td>$${parseFloat(employee.sueldo_diario).toFixed(2)}</td>
             <td>${employee.telefono}</td>
+            <td>${employee.email}</td>
             <td class="actions">
                 <button class="edit-btn" data-id="${employee.id}"><i class="fas fa-edit"></i> Editar</button>
                 <button class="delete-btn" data-id="${employee.id}"><i class="fas fa-trash-alt"></i> Eliminar</button>

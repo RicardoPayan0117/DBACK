@@ -299,4 +299,50 @@
         .current-page {
             background-color: #2980b9;
         }
-    
+    .requests-notes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.request-note {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    width: 250px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.request-note:hover {
+    box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+}
+
+.request-note h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.request-note p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+.request-note .actions {
+    margin-top: 0.8rem;
+    text-align: right;
+}
+
+.request-note .actions button {
+    margin-left: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.request-note p.direccion {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

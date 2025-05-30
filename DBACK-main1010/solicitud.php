@@ -248,7 +248,7 @@
                     </div>
                 </div>
                 
-                <!-- Información de pago -->
+<!-- Información de pago -->
                 <fieldset>
                     <legend>Opciones de pago</legend>
                     <p>Para asegurar su servicio, puede realizar un depósito del 20% del costo total estimado.</p>
@@ -259,7 +259,7 @@
                         <h4 id="payment-methods-label">Seleccione método de pago:</h4>
                         
                         <div class="payment-method" tabindex="0" role="radio" aria-checked="true" onclick="selectPaymentMethod('efectivo')" onkeydown="handlePaymentMethodKey(event, 'efectivo')">
-                            <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo" checked>
+                            <input type="radio" name="metodo_pago" id="metodo_efectivo" value="efectivo" <?php echo (!isset($_POST['metodo_pago_seleccionado']) || $_POST['metodo_pago_seleccionado'] == 'efectivo') ? 'checked' : ''; ?>>
                             <img src="https://cdn-icons-png.flaticon.com/512/639/639365.png" alt="Efectivo" class="payment-method-icon" width="40" height="40">
                             <div class="payment-method-details">
                                 <h4 class="payment-method-title">Efectivo</h4>
@@ -267,13 +267,46 @@
                             </div>
                         </div>
                         
+                        <div class="payment-method" tabindex="0" role="radio" aria-checked="false" onclick="selectPaymentMethod('paypal')" onkeydown="handlePaymentMethodKey(event, 'paypal')">
+                            <input type="radio" name="metodo_pago" id="metodo_paypal" value="paypal" <?php echo (isset($_POST['metodo_pago_seleccionado']) && $_POST['metodo_pago_seleccionado'] == 'paypal') ? 'checked' : ''; ?>>
+                            <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal" class="payment-method-icon" width="40" height="40">
+                            <div class="payment-method-details">
+                                <h4 class="payment-method-title">PayPal</h4>
+                                <p class="payment-method-description">Pago seguro con tarjeta de crédito o cuenta PayPal</p>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Contenedor para efectivo -->
-                    <div id="efectivo-container" class="payment-container">
+                    <div id="efectivo-container" class="payment-container" style="<?php echo (!isset($_POST['metodo_pago_seleccionado']) || $_POST['metodo_pago_seleccionado'] == 'efectivo') ? 'display:block;' : 'display:none;'; ?>">
                         <p>Ha seleccionado pago en efectivo.</p>
-                        <p>El monto total de <strong id="efectivo-total">$0.00 MXN</strong> deberá ser pagado al finalizar el servicio.</p>
+                        <p>El monto total de <strong id="efectivo-total"><?php echo isset($_POST['costo']) ? '$' . htmlspecialchars($_POST['costo']) . ' MXN' : '$0.00 MXN'; ?></strong> deberá ser pagado al finalizar el servicio.</p>
                         <p><strong>Nota:</strong> Al elegir este método, un operador se pondrá en contacto con usted para confirmar los detalles.</p>
                     </div>
+                    
+                    <!-- Contenedor del botón de PayPal -->
+                    <div id="paypal-container" class="payment-container" style="<?php echo (isset($_POST['metodo_pago_seleccionado']) && $_POST['metodo_pago_seleccionado'] == 'paypal') ? 'display:block;' : 'display:none;'; ?>">
+                        <div id="paypal-button-container">
+                            <?php if (isset($_POST['paypal_order_id']) && $_POST['paypal_order_id'] != ''): ?>
+                            <div class="paypal-success">
+                                <h4>¡Pago completado con éxito!</h4>
+                                <p>ID de transacción: <?php echo htmlspecialchars($_POST['paypal_order_id']); ?></p>
+                                <p>Estado: <?php echo htmlspecialchars($_POST['paypal_status']); ?></p>
+                            </div>
+                            <?php else: ?>
+                            <button id="custom-paypal-button" class="paypal-button" type="button" onclick="initiatePayPalPayment()">
+                                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" alt="PayPal Logo" width="20" height="20">
+                                Pagar con PayPal
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="paypal_order_id" name="paypal_order_id" value="<?php echo isset($_POST['paypal_order_id']) ? htmlspecialchars($_POST['paypal_order_id']) : ''; ?>">
+                    <input type="hidden" id="paypal_status" name="paypal_status" value="<?php echo isset($_POST['paypal_status']) ? htmlspecialchars($_POST['paypal_status']) : ''; ?>">
+                    <input type="hidden" id="paypal_email" name="paypal_email" value="<?php echo isset($_POST['paypal_email']) ? htmlspecialchars($_POST['paypal_email']) : ''; ?>">
+                    <input type="hidden" id="paypal_name" name="paypal_name" value="<?php echo isset($_POST['paypal_name']) ? htmlspecialchars($_POST['paypal_name']) : ''; ?>">
+                    <input type="hidden" id="metodo_pago_seleccionado" name="metodo_pago_seleccionado" value="<?php echo isset($_POST['metodo_pago_seleccionado']) ? htmlspecialchars($_POST['metodo_pago_seleccionado']) : 'efectivo'; ?>">
                 </fieldset>
 
                 <!-- Checkbox para confirmar consentimiento -->
@@ -359,6 +392,8 @@
             </div>
         </div>
     </main>
+
+//no le muevan si no saben
 <script>
 document.getElementById('obtenerUbicacionOrigen').addEventListener('click', () => {
   if (navigator.geolocation) {
@@ -610,6 +645,16 @@ document.addEventListener('DOMContentLoaded', () => {
     errores.marca.style.display = 'none';
     return true;
   }
+function validarPlaca() {
+  const regex = /^[A-Z0-9]{6,7}$/i;
+  if (!placa.value.trim() || !regex.test(placa.value.trim())) {
+    errores.placa.style.display = 'block';
+    return false;
+  }
+  errores.placa.style.display = 'none';
+  return true;
+}
+
 
   function validarModelo() {
     if (!modelo.value.trim() || modelo.value.trim().length < 2) {
@@ -654,6 +699,14 @@ document.addEventListener('DOMContentLoaded', () => {
     errores.descripcion.style.display = 'none';
     return true;
   }
+function convertirImagenABase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result); // INCLUYE el encabezado data:image/...
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file); // OJO: esto es lo correcto
+  });
+}
 
   function validarConsentimiento() {
     if (!consentimiento.checked) {
@@ -681,6 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
         case 'ubicacion_destino': validarUbicacionDestino(); break;
         case 'tipo_vehiculo': validarTipoVehiculo(); break;
         case 'marca': validarMarca(); break;
+        case 'placa': validarPlaca(); break;
         case 'modelo': validarModelo(); break;
         case 'foto': validarFoto(); break;
         case 'tipo_servicio': validarTipoServicio(); break;
@@ -691,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const validaciones = [
@@ -702,6 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
       validarUbicacionDestino(),
       validarTipoVehiculo(),
       validarMarca(),
+      validarPlaca(),
       validarModelo(),
       validarFoto(),
       validarTipoServicio(),
@@ -723,11 +778,22 @@ document.addEventListener('DOMContentLoaded', () => {
         foto_vehiculo: null, // si quieres base64, hay que leer el archivo
         tipo_servicio: tipo_servicio.value.trim(),
         descripcion: descripcion.value.trim(),
-        distancia: document.getElementById("distancia").value,
-        costo: document.getElementById("costo").value,
+        distancia: document.getElementById("distancia").textContent.replace(" km", "").trim(),
+        costo: document.getElementById("costo").textContent.replace(" MXN", "").replace("$", "").trim(),
         metodo_pago: "Efectivo",
         consentimiento: consentimiento.checked
       };
+
+      if (foto.files.length > 0) {
+          try {
+            datosFormulario.foto_vehiculo = await convertirImagenABase64(foto.files[0]);
+          } catch (error) {
+              console.error('Error al convertir imagen a base64:', error);
+              errores.foto.style.display = 'block';
+            return; // detener envío
+          }
+        }
+
       console.log("Datos a enviar:", JSON.stringify(datosFormulario, null, 2));
       // Enviar con fetch
       fetch("solicitud_api.php", {
@@ -751,11 +817,30 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       const firstErrorField = [
         nombre, telefono, email, ubicacion_origen, ubicacion_destino, tipo_vehiculo,
-        marca, modelo, foto, tipo_servicio, descripcion, consentimiento
+        marca, placa, modelo, foto, tipo_servicio, descripcion, consentimiento
       ].find((field, i) => !validaciones[i]);
       if (firstErrorField) firstErrorField.focus();
     }
   });
+  function enviarDatos(datosFormulario) {
+  fetch("solicitud_api.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datosFormulario)
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('successModal').hidden = false;
+    console.log("Respuesta del servidor:", data);
+  })
+  .catch(err => {
+    console.error("Error al enviar la solicitud:", err);
+    alert("Ocurrió un error al enviar el formulario.");
+  });
+}
+
 });
 
 </script>
