@@ -248,7 +248,7 @@
                     </div>
                 </div>
                 
-<!-- Información de pago -->
+                <!-- Información de pago -->
                 <fieldset>
                     <legend>Opciones de pago</legend>
                     <p>Para asegurar su servicio, puede realizar un depósito del 20% del costo total estimado.</p>
@@ -312,13 +312,19 @@
                 <!-- Checkbox para confirmar consentimiento -->
                 <div id="privacy-container" class="privacy-checkbox-container">
                     <input type="checkbox" id="consentimiento" name="consentimiento" required aria-required="true">
-                    <label for="consentimiento"><span class="privacy-text">He leído y acepto la <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span></span></label>
-                    <div id="consentimiento-error" class="error-message" role="alert">Debe aceptar la política de privacidad para continuar</div>
+                    <label for="consentimiento">
+                        <span class="privacy-text">
+                            He leído y acepto la 
+                            <span class="privacy-link" id="openConsentModal" tabindex="0" role="button">política de privacidad</span>
+                        </span>
+                    </label>
+                    <div id="consentimiento-error" class="error-message" role="alert" hidden>Debe aceptar la política de privacidad para continuar</div>
                 </div>
+
                 
                 <!-- Botones de acción -->
                 <div class="action-buttons">
-                    <button type="submit" class="cta-button">Enviar Solicitud</button>
+                    <button type="submit" class="cta-button" disabled>Enviar Solicitud</button>
                 </div>
             </form>
             <p class="emergency-note">Para emergencias inmediatas, llame al <a href="tel:+526688253351" class="emergency-phone">668-825-3351</a></p>
@@ -437,6 +443,23 @@ document.getElementById('obtenerUbicacionDestino').addEventListener('click', () 
 
 // Inicializar mapa centrado en coordenadas por defecto (puedes usar cualquier lugar)
   document.addEventListener("DOMContentLoaded", function () {
+    // 🆕 Mapa para origen
+  const mapaOrigen = L.map('mapaOrigen').setView([25.7896, -109.0053], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(mapaOrigen);
+
+  let marcadorOrigen = null;
+  mapaOrigen.on('click', function (e) {
+    const { lat, lng } = e.latlng;
+    if (marcadorOrigen) {
+      marcadorOrigen.setLatLng(e.latlng);
+    } else {
+      marcadorOrigen = L.marker(e.latlng).addTo(mapaOrigen);
+    }
+    document.getElementById('ubicacion_origen').value = `${lat},${lng}`;
+    actualizarDistanciaYCosto();
+  });
   // Mapa para destino (ya lo tienes)
   const mapaDestino = L.map('mapaDestino').setView([25.7896, -109.0053], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -455,23 +478,7 @@ document.getElementById('obtenerUbicacionDestino').addEventListener('click', () 
     actualizarDistanciaYCosto();
   });
 
-  // 🆕 Mapa para origen
-  const mapaOrigen = L.map('mapaOrigen').setView([25.7896, -109.0053], 13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(mapaOrigen);
 
-  let marcadorOrigen = null;
-  mapaOrigen.on('click', function (e) {
-    const { lat, lng } = e.latlng;
-    if (marcadorOrigen) {
-      marcadorOrigen.setLatLng(e.latlng);
-    } else {
-      marcadorOrigen = L.marker(e.latlng).addTo(mapaOrigen);
-    }
-    document.getElementById('ubicacion_origen').value = `${lat},${lng}`;
-    actualizarDistanciaYCosto();
-  });
 });
 
 function calcularDistancia(coord1, coord2) {
@@ -539,7 +546,69 @@ function actualizarDistanciaYCosto() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('servicioForm');
+    const form = document.getElementById('servicioForm');
+    const consentModal = document.getElementById('consentModal');
+    const openConsentModal = document.getElementById('openConsentModal');
+    const closeModal = document.getElementById('closeModal');
+    const acceptConsent = document.getElementById('acceptConsent');
+    const rejectConsent = document.getElementById('rejectConsent');
+    const rejectModal = document.getElementById('rejectModal');
+    const closeRejectModal = document.getElementById('closeRejectModal');
+    const successModal = document.getElementById('successModal');
+    const closeSuccessModal = document.getElementById('closeSuccessModal');
+
+    
+    // Muestra el modal de éxito
+    function mostrarModalExito() {
+        successModal.removeAttribute('hidden');
+    }
+
+    // Cierra el modal de éxito
+    closeSuccessModal.addEventListener('click', () => {
+        successModal.setAttribute('hidden', true);
+        window.location.href = 'index.html';
+    });
+
+    // Mostrar el modal al hacer clic en el texto "política de privacidad"
+    openConsentModal.addEventListener('click', () => {
+        consentModal.removeAttribute('hidden');
+    });
+
+    // Cerrar el modal principal
+    closeModal.addEventListener('click', () => {
+        consentModal.setAttribute('hidden', true);
+    });
+
+    // Botón "Aceptar" dentro del modal
+    acceptConsent.addEventListener('click', () => {
+        consentModal.setAttribute('hidden', true);
+        document.getElementById('consentimiento').checked = true; // Marca el checkbox
+    });
+
+    // Botón "Rechazar" dentro del modal
+    rejectConsent.addEventListener('click', () => {
+        consentModal.setAttribute('hidden', true);
+        document.getElementById('consentimiento').checked = false;
+        rejectModal.removeAttribute('hidden');
+    });
+
+    // Cerrar el modal de rechazo
+    closeRejectModal.addEventListener('click', () => {
+        rejectModal.setAttribute('hidden', true);
+    });
+    const consentimientoCheckbox = document.getElementById('consentimiento');
+    const enviarBtn = document.getElementById('cta-button');
+
+    // Actualiza el estado del botón según el checkbox
+    function toggleBotonEnviar() {
+        enviarBtn.disabled = !consentimientoCheckbox.checked;
+    }
+
+    // Ejecutar al cargar la página por si el checkbox ya está marcado
+    toggleBotonEnviar();
+
+    // Escuchar cambios en el checkbox
+    consentimientoCheckbox.addEventListener('change', toggleBotonEnviar);
 
   // Campos
   const nombre = form.nombre;
