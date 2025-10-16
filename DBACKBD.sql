@@ -350,7 +350,6 @@ CREATE TABLE `solicitudes` (
   `tipo_vehiculo` enum('automovil','camioneta','motocicleta','camion') NOT NULL,
   `marca_vehiculo` varchar(50) NOT NULL,
   `modelo_vehiculo` varchar(50) NOT NULL,
-  `foto_vehiculo` varchar(255) DEFAULT NULL,
   `tipo_servicio` enum('remolque','bateria','gasolina','llanta','arranque','otro') NOT NULL,
   `descripcion_problema` text,
   `urgencia` enum('normal','urgente','emergencia') NOT NULL DEFAULT 'normal',
